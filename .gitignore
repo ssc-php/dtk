@@ -1,0 +1,6 @@
+# composer
+vendor/
+
+# editors
+*.swp
+*.bak
