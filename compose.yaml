@@ -1,0 +1,11 @@
+name: ssc-dtk
+
+services:
+  app:
+    build: .
+    command: sleep infinity
+    volumes:
+      # Bind mount: current directory is mounted into the container
+      # vendor/ is availabe in the container (to run the app), and on the host (for LSP)
+      # run `composer <command>` in the container to update vendor/
+      - .:/app
