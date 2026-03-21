@@ -1,0 +1,11 @@
+includes:
+    - phpstan-baseline.neon
+    - vendor/jangregor/phpstan-prophecy/extension.neon
+
+parameters:
+  level: 10
+  paths:
+    - src/
+    - tests/
+  bootstrapFiles:
+    - vendor/autoload.php

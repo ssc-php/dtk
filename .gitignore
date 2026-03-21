@@ -14,6 +14,9 @@ vendor/
 .php-cs-fixer.php
 .php-cs-fixer.cache
 
+# phpstan
+phpstan.neon
+
 # phpunit
 phpunit.xml
 .phpunit.cache/

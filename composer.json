@@ -19,7 +19,9 @@
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.94.2",
         "phpspec/prophecy-phpunit": "^2.5",
-        "phpunit/phpunit": "^13.0.5"
+        "phpunit/phpunit": "^13.0.5",
+        "jangregor/phpstan-prophecy": "^2.3",
+        "phpstan/phpstan": "^2.1.42"
     },
     "config": {
         "allow-plugins": {
