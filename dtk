@@ -1,0 +1,36 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Ssc\Dtk\Infrastructure\Symfony\AppKernel;
+use Ssc\Dtk\Infrastructure\Symfony\DtkCli;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+
+if (!is_dir(__DIR__.'/vendor')) {
+    throw new LogicException('Dependencies are missing. Try running "composer install".');
+}
+
+if (!is_file(__DIR__.'/vendor/autoload_runtime.php')) {
+    throw new LogicException('Symfony Runtime is missing. Try running "composer require symfony/runtime".');
+}
+
+require_once __DIR__.'/vendor/autoload_runtime.php';
+
+return static function (array $context): DtkCli {
+    $kernel = new AppKernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+    $application = new Application($kernel);
+
+    // Register only DTK commands into DtkCli, filtering out Symfony framework
+    // commands (cache:clear, make:*, etc). Symfony default console commands
+    // (help, list, _complete, completion) are added by Application::__construct()
+    // and cannot be intercepted here, so they are filtered out in DtkCli::doRun instead.
+    $dtk = new DtkCli('dtk');
+    foreach ($application->all() as $command) {
+        if (str_starts_with($command::class, 'Ssc\\Dtk\\')) {
+            $dtk->addCommand($command);
+        }
+    }
+
+    return $dtk;
+};

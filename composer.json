@@ -1,0 +1,38 @@
+{
+    "name": "ssc/dtk",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Loïc Faugeron",
+            "email": "faugeron.loic@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.5",
+        "symfony/console": "^8.0.7",
+        "symfony/dotenv": "^8.0.7",
+        "symfony/framework-bundle": "^8.0.7",
+        "symfony/runtime": "^8.0.1",
+        "symfony/yaml": "^8.0.6"
+    },
+    "require-dev": {
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": true
+        },
+        "bump-after-update": true,
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Ssc\\Dtk\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ssc\\Dtk\\Tests\\": "tests/"
+        }
+    }
+}
