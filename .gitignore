@@ -10,6 +10,10 @@ vendor/
 .env.local.php
 .env.*.local
 
+# phpunit
+phpunit.xml
+.phpunit.cache/
+
 # symfony
 config/reference.php
 config/secrets/prod/prod.decrypt.private.php
