@@ -131,3 +131,6 @@ app-qa: ## Runs full QA pipeline (composer-dump, cs-check, phpstan-analyze, rect
 	@$(MAKE) phpunit
 	@echo ''
 	@echo '  [OK] QA done'
+
+app-bin: ## Builds DTK binaries (PHAR + static PHP micro runtime) for all platforms (Linux, Mac, Windows)
+	@docker compose exec $(DTK_SERVICE) sh bin/mk-dtk-bin.sh

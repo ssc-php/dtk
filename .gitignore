@@ -21,6 +21,9 @@ phpstan.neon
 phpunit.xml
 .phpunit.cache/
 
+# build artifacts
+build/
+
 # symfony
 config/reference.php
 config/secrets/prod/prod.decrypt.private.php
