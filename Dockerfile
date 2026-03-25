@@ -44,7 +44,7 @@ RUN curl --fail --location --silent \
         "https://github.com/box-project/box/releases/download/${BOX_VERSION}/box.phar" \
     && chmod +x /usr/local/bin/box
 
-# Download micro.sfx (static PHP runtime) for all target platforms — used by `make app-bin`
+# Download micro.sfx (static PHP runtime) for all target platforms — used by `make app-prep-release`
 # https://static-php.dev/en/guide/precompiled.html
 ARG PHP_VERSION
 RUN for PLATFORM in linux-x86_64 linux-aarch64 macos-x86_64 macos-aarch64; do \

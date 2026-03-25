@@ -32,6 +32,13 @@ set -euo pipefail
 # a PHP project, so we don't need to prefix namespaces (e.g. Psr\Log\LoggerInterface
 # to DtkScoper\Psr\Log\LoggerInterface) to avoid conflicts.
 #
+# Running order:
+# 1. bump/dtk.sh
+# 2. mk-dtk-bin.sh
+# 3. mk-changelog.sh
+# 4. review and tweak CHANGELOG.md
+# 5. mk-release.sh
+#
 # Usage:
 #
 # ```shell
@@ -81,5 +88,6 @@ sha256sum \
 echo '       build/checksums.txt'
 
 echo ''
-echo '  [OK] Binaries built'
+echo '  [OK]   Built binaries'
+echo "  [NEXT] Run bin/mk-changelog.sh"
 echo ''

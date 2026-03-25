@@ -132,5 +132,10 @@ app-qa: ## Runs full QA pipeline (composer-dump, cs-check, phpstan-analyze, rect
 	@echo ''
 	@echo '  [OK] QA done'
 
-app-bin: ## Builds DTK binaries (PHAR + static PHP micro runtime) for all platforms (Linux, Mac, Windows)
+app-prep-release: ## Bumps version, builds binaries and generates CHANGELOG entry, then review before app-release (version=X.Y.Z)
+	@bin/bump/dtk.sh $(version)
 	@docker compose exec $(DTK_SERVICE) sh bin/mk-dtk-bin.sh
+	@bin/mk-changelog.sh
+
+app-release: ## Commits, tags, pushes and creates a GitHub release, run app-prep-release first
+	@bin/mk-release.sh
