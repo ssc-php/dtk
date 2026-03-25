@@ -139,6 +139,7 @@ Available commands:
 Further documentation can be found in:
 
 * [`docs/how-to/`](docs/how-to/): how-to guides
+    * `0xx` are for local development (e.g. `001-how-to-run-qa.md`)
 
 You can see the current and past versions using one of the following:
 

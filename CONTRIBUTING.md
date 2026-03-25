@@ -87,12 +87,21 @@ action (commits should be atomic: one action = one commit).
 
 Types:
 
-* `fix`: a correction of the code (bug, security hole, typos);
+* `feat`: addition of a new feature;
+* `fix`: correction of a bug or typo;
+* `fix(security)`: correction of a security vulnerability;
+* `perf`: improvement of performance;
 * `test`: creation or correction of tests;
 * `docs`: creation or correction of documentation;
-* `refactor`: improvement or cleaning of code;
-* `chore`: any maintenance related to dependencies, config, etc;
-* `feat`: everything else (creation, modification or removal of a functionality).
+* `refactor`: improvement or cleaning of code (no behaviour change);
+* `chore`: any maintenance related to dependencies, config, etc.
+
+Breaking changes (removals, incompatible API changes) are marked with `!`
+after the type: `feat!: remove legacy export format`.
+
+> Note: the changelog generator (`bin/mk-changelog.sh`) lists all `!` commits
+> under the **Removed** section, regardless of their type. By convention,
+> any backward-incompatible change is treated as a removal for changelog purposes.
 
 The `<scope>` is the ticket id when available, omitted otherwise.
 Types are the same as for branch naming.
@@ -102,7 +111,9 @@ Types are the same as for branch naming.
 * `feat(DTK-42): add login redirect after authentication`;
 * `fix(DTK-137): handle empty CSV export gracefully`;
 * `feat: add login redirect after authentication`;
-* `fix: handle empty CSV export gracefully`.
+* `fix: handle empty CSV export gracefully`;
+* `fix(security): sanitize file path in export endpoint`;
+* `feat!: remove PHP 7 support`.
 
 ## Keeping your fork up-to-date
 
