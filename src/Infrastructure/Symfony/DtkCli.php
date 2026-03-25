@@ -60,8 +60,11 @@ final class DtkCli extends Application
 
     public function doRun(InputInterface $input, OutputInterface $output): int
     {
-        // Command provided, execute it
-        if (null !== $this->getCommandName($input)) {
+        // Command provided, or a built-in flag like --version/-V: delegate to Symfony
+        if (
+            null !== $this->getCommandName($input)
+            || $input->hasParameterOption(['--version', '-V'], true)
+        ) {
             return parent::doRun($input, $output);
         }
 

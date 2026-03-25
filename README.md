@@ -42,45 +42,104 @@ All commands are configurable to fit any workflow, with support for:
 
 ## Getting started
 
-For development purpose, everything is run inside a Docker container,
-which can be abstracted using `make` as a task runner:
+Download the binary for your platform from the [releases page](https://github.com/ssc/dtk/releases):
+
+| Platform       | Binary                   | Examples                                |
+|----------------|--------------------------|-----------------------------------------|
+| Linux aarch64  | `dtk-linux-aarch64`      | AWS Graviton, Raspberry Pi, ARM servers |
+| macOS aarch64  | `dtk-macos-aarch64`      | Apple Silicon Macs (M1, etc)            |
+| macOS x86_64   | `dtk-macos-x86_64`       | Intel Macs (pre-2020)                   |
+| Windows x86_64 | `dtk-windows-x86_64.exe` | Most Windows desktops and servers       |
+
+<details>
+<summary>**🐧 On Linux:**</summary>
 
 ```console
-# First install (Docker build and up)
-make app-init
+curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc/dtk/releases/latest/download/dtk-linux-x86_64" -o /tmp/dtk
 
-# Run dtk
-make dtk
+install -m 755 -D /tmp/dtk ~/.local/bin/dtk
+```
 
-# Run the full QA pipeline (cs, phpstan, rector, phpunit)
-make app-qa
+Verify the checksum:
 
-# Run tests (PHPUnit)
-make phpunit
+```console
+curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc/dtk/releases/latest/download/checksums.txt" \
+  | grep "dtk-linux-x86_64" | awk '{print $1 "  /tmp/dtk"}' | sha256sum --check
+```
 
-# Run tests for a specific class, with readable output, in definition order
-make phpunit arg='--testdox --order-by=default --filter MyTest'
+> On ARM (e.g. AWS Graviton, Raspberry Pi, etc), replace `dtk-linux-x86_64` with `dtk-linux-aarch64`.
 
-# Check coding standards (PHP-CS-Fixer)
-make cs-check
+</details>
 
-# Fix coding standards (Swiss Knife PSR-4 alignment + PHP-CS-Fixer)
-make cs-fix
+<details>
+<summary>**🍎 On macOS:**</summary>
 
-# Static analysis (PHPStan)
-make phpstan-analyze
+```console
+curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc/dtk/releases/latest/download/dtk-macos-aarch64" -o /tmp/dtk
 
-# Automated refactoring checks (Rector)
-make rector-check
+install -m 755 /tmp/dtk ~/.local/bin/dtk
+```
 
-# Fix automated refactorings (Rector)
-make rector-fix
+Verify the checksum:
 
-# Discover everything you can do
-make
+```console
+curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc/dtk/releases/latest/download/checksums.txt" \
+  | grep "dtk-macos-aarch64" | awk '{print $1 "  /tmp/dtk"}' | shasum -a 256 --check
+```
+
+> On Intel Macs (pre-2020), replace `dtk-macos-aarch64` with `dtk-macos-x86_64`.
+> Make sure `~/.local/bin` is in your `PATH`.
+
+</details>
+
+<details>
+<summary>**🪟 On Windows** (run in PowerShell):</summary>
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.local\bin" | Out-Null
+Invoke-WebRequest -Uri "https://github.com/ssc/dtk/releases/latest/download/dtk-windows-x86_64.exe" -OutFile "$env:TEMP\dtk.exe"
+```
+
+Verify the checksum:
+
+```powershell
+$hash = (Get-FileHash "$env:TEMP\dtk.exe" -Algorithm SHA256).Hash.ToLower()
+$expected = (Invoke-WebRequest -Uri "https://github.com/ssc/dtk/releases/latest/download/checksums.txt").Content -split '\r?\n' |
+  Where-Object { $_ -match "dtk-windows-x86_64.exe" } | ForEach-Object { ($_ -split '\s+')[0] }
+if ($hash -ne $expected) { throw "Checksum mismatch" }
+```
+
+```powershell
+Move-Item "$env:TEMP\dtk.exe" "$env:USERPROFILE\.local\bin\dtk.exe"
+```
+
+> Make sure `%USERPROFILE%\.local\bin` is in your `PATH`.
+
+</details>
+
+---
+
+## Usage
+
+And run `dtk` without any argument to get the "help" screen:
+
+```console
+$ dtk
+   ██████
+ ██  ██████   DTK: Devonshire Tea caKe
+████████  ██  Kanban, Git and Deployment,
+ ████  ████   in one coherent flow.
+   ██████
+Available commands:
+    ...
 ```
 
 ## Want to know more?
+
+Further documentation can be found in:
+
+* [`docs/how-to/`](docs/how-to/): how-to guides
+    * `0xx` are for local development (e.g. `001-how-to-run-qa.md`)
 
 You can see the current and past versions using one of the following:
 

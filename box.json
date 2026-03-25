@@ -1,0 +1,16 @@
+{
+    "$schema": "https://box-project.github.io/box/schema.json",
+    "main": "dtk",
+    "output": "build/dtk.phar",
+    "compression": "GZ",
+    "check-requirements": false,
+    "directories": [
+        "config",
+        "src",
+        "var/cache/prod",
+        "vendor"
+    ],
+    "files": [
+        ".env.local.php"
+    ]
+}

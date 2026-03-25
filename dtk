@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 use Ssc\Dtk\Infrastructure\Symfony\AppKernel;
 use Ssc\Dtk\Infrastructure\Symfony\DtkCli;
+use Ssc\Dtk\Infrastructure\Symfony\Version;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 if (!is_dir(__DIR__.'/vendor')) {
@@ -25,7 +26,7 @@ return static function (array $context): DtkCli {
     // commands (cache:clear, make:*, etc). Symfony default console commands
     // (help, list, _complete, completion) are added by Application::__construct()
     // and cannot be intercepted here, so they are filtered out in DtkCli::doRun instead.
-    $dtk = new DtkCli('dtk');
+    $dtk = new DtkCli('dtk', Version::VERSION);
     foreach ($application->all() as $command) {
         if (str_starts_with($command::class, 'Ssc\\Dtk\\')) {
             $dtk->addCommand($command);
