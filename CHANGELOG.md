@@ -7,4 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/ssc/dtk/releases
+## [0.1.0] - 2026-03-25
+
+### Added
+- add `dtk` app
+- add `dtk --version` flag
+
+[Unreleased]: https://github.com/ssc-php/dtk/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/ssc-php/dtk/releases/tag/v0.1.0
