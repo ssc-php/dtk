@@ -42,7 +42,22 @@ All commands are configurable to fit any workflow, with support for:
 
 ## Getting started
 
-Download the binary for your platform from the [releases page](https://github.com/ssc/dtk/releases):
+### Homebrew (macOS and Linux)
+
+```console
+brew tap ssc-php/dtk
+brew install dtk
+```
+
+To upgrade:
+
+```console
+brew upgrade dtk
+```
+
+### Manual install
+
+Download the binary for your platform from the [releases page](https://github.com/ssc-php/dtk/releases):
 
 | Platform       | Binary                   | Examples                                |
 |----------------|--------------------------|-----------------------------------------|
@@ -55,7 +70,7 @@ Download the binary for your platform from the [releases page](https://github.co
 <summary>**🐧 On Linux:**</summary>
 
 ```console
-curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc/dtk/releases/latest/download/dtk-linux-x86_64" -o /tmp/dtk
+curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc-php/dtk/releases/latest/download/dtk-linux-x86_64" -o /tmp/dtk
 
 install -m 755 -D /tmp/dtk ~/.local/bin/dtk
 ```
@@ -63,7 +78,7 @@ install -m 755 -D /tmp/dtk ~/.local/bin/dtk
 Verify the checksum:
 
 ```console
-curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc/dtk/releases/latest/download/checksums.txt" \
+curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc-php/dtk/releases/latest/download/checksums.txt" \
   | grep "dtk-linux-x86_64" | awk '{print $1 "  /tmp/dtk"}' | sha256sum --check
 ```
 
@@ -75,7 +90,7 @@ curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc/dtk/releases/lates
 <summary>**🍎 On macOS:**</summary>
 
 ```console
-curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc/dtk/releases/latest/download/dtk-macos-aarch64" -o /tmp/dtk
+curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc-php/dtk/releases/latest/download/dtk-macos-aarch64" -o /tmp/dtk
 
 install -m 755 /tmp/dtk ~/.local/bin/dtk
 ```
@@ -83,7 +98,7 @@ install -m 755 /tmp/dtk ~/.local/bin/dtk
 Verify the checksum:
 
 ```console
-curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc/dtk/releases/latest/download/checksums.txt" \
+curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc-php/dtk/releases/latest/download/checksums.txt" \
   | grep "dtk-macos-aarch64" | awk '{print $1 "  /tmp/dtk"}' | shasum -a 256 --check
 ```
 
@@ -97,14 +112,14 @@ curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc/dtk/releases/lates
 
 ```powershell
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.local\bin" | Out-Null
-Invoke-WebRequest -Uri "https://github.com/ssc/dtk/releases/latest/download/dtk-windows-x86_64.exe" -OutFile "$env:TEMP\dtk.exe"
+Invoke-WebRequest -Uri "https://github.com/ssc-php/dtk/releases/latest/download/dtk-windows-x86_64.exe" -OutFile "$env:TEMP\dtk.exe"
 ```
 
 Verify the checksum:
 
 ```powershell
 $hash = (Get-FileHash "$env:TEMP\dtk.exe" -Algorithm SHA256).Hash.ToLower()
-$expected = (Invoke-WebRequest -Uri "https://github.com/ssc/dtk/releases/latest/download/checksums.txt").Content -split '\r?\n' |
+$expected = (Invoke-WebRequest -Uri "https://github.com/ssc-php/dtk/releases/latest/download/checksums.txt").Content -split '\r?\n' |
   Where-Object { $_ -match "dtk-windows-x86_64.exe" } | ForEach-Object { ($_ -split '\s+')[0] }
 if ($hash -ne $expected) { throw "Checksum mismatch" }
 ```
@@ -144,7 +159,7 @@ Further documentation can be found in:
 You can see the current and past versions using one of the following:
 
 * the `git tag` command
-* the [releases page on Github](https://github.com/ssc/dtk/releases)
+* the [releases page on Github](https://github.com/ssc-php/dtk/releases)
 * the file listing the [changes between versions](CHANGELOG.md)
 
 And finally some meta documentation:

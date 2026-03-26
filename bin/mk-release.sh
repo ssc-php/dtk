@@ -108,6 +108,9 @@ gh release create "${_TAG}" \
     build/dtk-windows-x86_64.exe \
     build/checksums.txt
 
+echo '  // Updating Homebrew tap...'
+"${_BIN_DIR}/mk-brew-formula.sh"
+
 echo ''
 echo "  [OK] Released ${_TAG}"
 echo ''
