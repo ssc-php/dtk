@@ -32,6 +32,7 @@ This will:
 3. Create an annotated git tag `vX.Y.Z`
 4. Push the commit and tag
 5. Create a GitHub release with the binaries and `checksums.txt` attached
+6. Update the Homebrew formula in `ssc-php/homebrew-dtk` and push it
 
 ## Bump PHP version
 

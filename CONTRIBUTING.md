@@ -3,7 +3,7 @@
 Everybody should be able to help. Here's how you can make this project more
 awesome:
 
- 1. [Fork the repository](https://github.com/ssc/dtk/fork_select);
+ 1. [Fork the repository](https://github.com/ssc-php/dtk/fork_select);
  2. create your own branch from `main`: `git checkout -b <ticket-id>/<ticket-title>` (or `<type>/<title>` if you have no ticket);
  3. make your changes and don't forget to:
     * check that the tests pass;
@@ -120,7 +120,7 @@ Types are the same as for branch naming.
 Track the upstream (original) repository:
 
 ```console
-git remote add upstream https://github.com/ssc/dtk.git
+git remote add upstream https://github.com/ssc-php/dtk.git
 ```
 
 Then, before publishing your changes, get the upstream changes:
