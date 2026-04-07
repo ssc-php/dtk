@@ -19,6 +19,7 @@
         <ini name="error_reporting" value="-1" />
         <env name="APP_ENV" value="test" force="true" />
         <env name="SHELL_VERBOSITY" value="-1" />
+        <env name="DTK_DATA_DIR" value="/tmp/dtk-test" force="true" />
     </php>
     <testsuites>
         <testsuite name="dtk-spec">
