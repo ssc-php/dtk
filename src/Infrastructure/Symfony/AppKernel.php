@@ -24,6 +24,7 @@ class AppKernel extends Kernel
      *
      * getBuildDir() inherits this override automatically, as the base Kernel defaults it to getCacheDir().
      */
+    #[\Override]
     public function getCacheDir(): string
     {
         $pharPath = \Phar::running(true);
@@ -40,6 +41,7 @@ class AppKernel extends Kernel
      * The PHAR archive itself is read-only, so the default log path (var/log/ inside
      * the archive) cannot be written to. ~/.cache/dtk/log is used instead.
      */
+    #[\Override]
     public function getLogDir(): string
     {
         if ('' !== \Phar::running(true)) {
