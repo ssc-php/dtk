@@ -1,8 +1,10 @@
 # Parameters (optional)
 # * `arg`: arbitrary arguments to pass to rules (default: none)
 # * `env`: used to set `APP_ENV` (default: `test`)
+# * `envs`: extra env vars to pass to docker compose exec (default: none, eg `envs='FOO=bar BAZ=qux'`)
 arg ?=
 env ?= test
+envs ?=
 
 # Docker containers
 DTK_SERVICE = app
@@ -10,7 +12,7 @@ DTK_SERVICE = app
 # Executables
 COMPOSER = docker compose exec $(DTK_SERVICE) composer
 CONSOLE = docker compose exec -e APP_ENV=$(env) $(DTK_SERVICE) php bin/console
-DTK = docker compose exec -e APP_ENV=$(env) $(DTK_SERVICE) php dtk
+DTK = docker compose exec -e APP_ENV=$(env) $(foreach e,$(envs),-e $(e)) $(DTK_SERVICE) php dtk
 PHP_CS_FIXER = docker compose exec $(DTK_SERVICE) php vendor/bin/php-cs-fixer
 PHPSTAN = docker compose exec $(DTK_SERVICE) php vendor/bin/phpstan --memory-limit=256M
 PHPUNIT = docker compose exec $(DTK_SERVICE) php vendor/bin/phpunit
@@ -93,7 +95,8 @@ rector-check: ## Refactoring checks with Rector
 	@$(RECTOR) process --dry-run
 
 ## —— DTK 🫂 ————————————————————————————————————————————————————————————————
-dtk: ## Runs DTK CLI (arg, env, eg `arg='version'`)
+dtk: ## Runs DTK CLI (arg, env, envs, eg `arg='tokens:save --service=youtrack' envs='DTK_TOKEN=…'`)
+	@docker compose exec $(DTK_SERVICE) sh bin/sfcc-if-stale.sh $(env)
 	@$(DTK) $(arg)
 
 ## —— App 📱 ———————————————————————————————————————————————————————————————————

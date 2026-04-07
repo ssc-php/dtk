@@ -5,7 +5,9 @@ declare(strict_types=1);
 
 use Ssc\Dtk\Infrastructure\Symfony\AppKernel;
 use Ssc\Dtk\Infrastructure\Symfony\DtkCli;
+use Ssc\Dtk\Infrastructure\Symfony\DtkHelpCommand;
 use Ssc\Dtk\Infrastructure\Symfony\Version;
+use Ssc\Dtk\Infrastructure\Symfony\DtkCommandDescriptor;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 if (!is_dir(__DIR__.'/vendor')) {
@@ -22,16 +24,18 @@ return static function (array $context): DtkCli {
     $kernel = new AppKernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
     $application = new Application($kernel);
 
-    // Register only DTK commands into DtkCli, filtering out Symfony framework
-    // commands (cache:clear, make:*, etc). Symfony default console commands
-    // (help, list, _complete, completion) are added by Application::__construct()
-    // and cannot be intercepted here, so they are filtered out in DtkCli::doRun instead.
+    // Register only DTK commands (listed in DtkCli::COMMANDS),
+    // excluding Symfony framework commands (cache:clear, debug:*, etc.).
     $dtk = new DtkCli('dtk', Version::VERSION);
-    foreach ($application->all() as $command) {
-        if (str_starts_with($command::class, 'Ssc\\Dtk\\')) {
-            $dtk->addCommand($command);
-        }
+    foreach (array_keys(DtkCli::COMMANDS) as $name) {
+        $dtk->addCommand($application->get($name));
     }
+
+    // Wire up the event dispatcher so that monolog's ConsoleHandler can capture the output
+    $dtk->setDispatcher($kernel->getContainer()->get('event_dispatcher'));
+
+    // Replace Symfony HelpCommand with our own, to customise the output
+    $dtk->addCommand(new DtkHelpCommand(new DtkCommandDescriptor(), $dtk));
 
     return $dtk;
 };
