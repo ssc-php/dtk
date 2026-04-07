@@ -9,7 +9,7 @@ use Ssc\Dtk\Infrastructure\Symfony\AppKernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
-final class TestKernel
+final readonly class TestKernel
 {
     public static function make(): self
     {

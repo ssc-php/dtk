@@ -39,6 +39,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Ssc\\Dtk\\Dev\\": "dev/",
             "Ssc\\Dtk\\Tests\\": "tests/"
         }
     }

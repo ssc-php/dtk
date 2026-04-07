@@ -16,6 +16,8 @@ use Rector\Set\ValueObject\SetList;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 use Rector\Visibility\Rector\ClassConst\ChangeConstantVisibilityRector;
 use Rector\Visibility\Rector\ClassMethod\ChangeMethodVisibilityRector;
+use Ssc\Dtk\Dev\Rector\DataProviderYieldArrayNewLinedRector;
+use Ssc\Dtk\Dev\Rector\TestMethodArgumentsNewLinedRector;
 
 return RectorConfig::configure()
     ->withCache(
@@ -45,6 +47,21 @@ return RectorConfig::configure()
     ])
     ->withSets([
         // —— PHP ——————————————————————————————————————————————————————————————
+        SetList::PHP_52,
+        SetList::PHP_53,
+        SetList::PHP_54,
+        SetList::PHP_55,
+        SetList::PHP_56,
+        SetList::PHP_70,
+        SetList::PHP_71,
+        SetList::PHP_72,
+        SetList::PHP_73,
+        SetList::PHP_74,
+        SetList::PHP_80,
+        SetList::PHP_81,
+        SetList::PHP_82,
+        SetList::PHP_83,
+        SetList::PHP_84,
         SetList::PHP_85,
 
         // —— Core —————————————————————————————————————————————————————————————
@@ -64,6 +81,10 @@ return RectorConfig::configure()
         PHPUnitSetList::PHPUNIT_120,
     ])
     ->withRules([
+        // —— Dtk ——————————————————————————————————————————————————————————————
+        DataProviderYieldArrayNewLinedRector::class,
+        TestMethodArgumentsNewLinedRector::class,
+
         // —— Core —————————————————————————————————————————————————————————————
         // Inherit parent visibility
         ChangeConstantVisibilityRector::class,
