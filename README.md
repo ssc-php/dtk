@@ -42,7 +42,7 @@ All commands are configurable to fit any workflow, with support for:
 
 ## Getting started
 
-### Homebrew (macOS and Linux)
+### Homebrew install (macOS and Linux)
 
 ```console
 brew tap ssc-php/dtk
@@ -55,7 +55,7 @@ To upgrade:
 brew upgrade dtk
 ```
 
-### Manual install
+#### Manual install
 
 Download the binary for your platform from the [releases page](https://github.com/ssc-php/dtk/releases):
 
@@ -67,7 +67,7 @@ Download the binary for your platform from the [releases page](https://github.co
 | Windows x86_64 | `dtk-windows-x86_64.exe` | Most Windows desktops and servers       |
 
 <details>
-<summary>**🐧 On Linux:**</summary>
+<summary><strong>🐧 On Linux:</strong></summary>
 
 ```console
 curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc-php/dtk/releases/latest/download/dtk-linux-x86_64" -o /tmp/dtk
@@ -87,7 +87,7 @@ curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc-php/dtk/releases/l
 </details>
 
 <details>
-<summary>**🍎 On macOS:**</summary>
+<summary><strong>🍎 On macOS:</strong></summary>
 
 ```console
 curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc-php/dtk/releases/latest/download/dtk-macos-aarch64" -o /tmp/dtk
@@ -108,7 +108,7 @@ curl --proto '=https' --tlsv1.2 -fsSL "https://github.com/ssc-php/dtk/releases/l
 </details>
 
 <details>
-<summary>**🪟 On Windows** (run in PowerShell):</summary>
+<summary><strong>🪟 On Windows</strong> (run in PowerShell):</summary>
 
 ```powershell
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.local\bin" | Out-Null
@@ -132,6 +132,34 @@ Move-Item "$env:TEMP\dtk.exe" "$env:USERPROFILE\.local\bin\dtk.exe"
 
 </details>
 
+### Set API tokens
+
+DTK needs API tokens to access services such as YouTrack.
+Save them once after installing:
+
+```console
+dtk tokens:save --service=youtrack
+```
+
+DTK will prompt for the token interactively (input is hidden).
+
+Alternatively (less safe), pass it via `DTK_TOKEN` for non-interactive contexts (CI pipelines, etc):
+
+```console
+DTK_TOKEN=<your-token> dtk tokens:save --service=youtrack
+```
+
+Tokens are stored in the first available backend:
+
+* [ ] 1Password
+* [ ] HashiCorp Vault
+* [x] Linux Secret Service
+* [x] macOS Keychain
+* [ ] Windows Credential Manager
+* [x] Plain file (fallback)
+
+See [`docs/how-to/usage/000-how-to-set-reset-rotate-tokens.md`](docs/how-to/usage/000-how-to-set-reset-rotate-tokens.md) for details.
+
 ---
 
 ## Usage
@@ -154,7 +182,10 @@ Available commands:
 Further documentation can be found in:
 
 * [`docs/how-to/`](docs/how-to/): how-to guides
-    * `0xx` are for local development (e.g. `001-how-to-run-qa.md`)
+    * [`development/`](docs/how-to/development/): local development (e.g. `001-how-to-run-qa.md`)
+    * [`usage/`](docs/how-to/usage/): using DTK (e.g. `000-how-to-set-reset-rotate-tokens.md`)
+* [`docs/reference/`](docs/reference/): reference docs
+    * `000-token-storage.md`: storage backends, commands, security properties
 
 You can see the current and past versions using one of the following:
 

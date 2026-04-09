@@ -25,4 +25,4 @@ make dtk
 make dtk arg="[command] [arguments/options]"
 ```
 
-Find further how-to guides in `docs/how-to/`.
+Find further how-to guides in `docs/how-to/development/`.
