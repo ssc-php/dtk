@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ssc\Dtk\Infrastructure\Symfony;
 
+use Ssc\Dtk\UserInterface\Cli\TokensSaveCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,8 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class DtkCli extends Application
 {
     /**
-     * width: 12
-     * height: 5.
+     * Width x Height: 12 x 5.
      *
      * @var array<string>
      */
@@ -29,6 +29,11 @@ final class DtkCli extends Application
         '   ██████   ',
     ];
 
+    /** @var array<string, class-string> */
+    public const array COMMANDS = [
+        TokensSaveCommand::NAME => TokensSaveCommand::class,
+    ];
+
     /** @var array<string> */
     private const array SLOGAN = [
         'DTK: Devonshire Tea caKe',
@@ -36,31 +41,84 @@ final class DtkCli extends Application
         'in one coherent flow.',
     ];
 
+    /**
+     * Output:
+     *
+     *    ██████
+     *  ██  ██████   DTK: Devonshire Tea caKe
+     * ████████  ██  Kanban, Git and Deployment,
+     *  ████  ████   in one coherent flow.
+     *    ██████
+     *
+     *   [INFO] Omit any option or env var to be prompted for it interactively.
+     *
+     * Available commands:
+     *   # Save token to allow DTK to access a service (Github, YouTrack, etc)
+     *   DTK_TOKEN=… tokens:save --service=…
+     *   ...
+     */
+    #[\Override]
     public function getHelp(): string
     {
-        // Colour LOGO in yellow
+        // LOGO, in yellow
         $lines = array_map(
             static fn (string $line): string => "<fg=yellow>{$line}</>",
             self::LOGO,
         );
 
-        // Add SLOGAN to the right of LOGO
+        // SLOGAN floating right of logo (first line in bold)
         $sloganMarginTop = 1;
         $sloganMarginLeft = '  ';
         foreach (self::SLOGAN as $i => $sloganLine) {
-            // First line in BOLD
             $styleOpen = 0 === $i ? '<options=bold>' : '';
             $styleClose = 0 === $i ? '</>' : '';
-
             $lines[$sloganMarginTop + $i] .= "{$sloganMarginLeft}{$styleOpen}{$sloganLine}{$styleClose}";
+        }
+
+        // INFO about interractive questions
+        $lines[] = '';
+        $lines[] = '<fg=blue>  [INFO] Omit any option or env var to be prompted for it interactively.</>';
+        $lines[] = '';
+
+        // List of DTK commands
+        $lines[] = '<fg=yellow>Available commands:</>';
+
+        $globalOptionNames = array_keys($this->getDefinition()->getOptions());
+        foreach (self::COMMANDS as $name => $class) {
+            $command = $this->get($name);
+
+            // SHORT_DESCRIPTION: first line of DESCRIPTION, in a gray comment
+            $shortDescription = array_first(explode("\n", $command->getDescription()));
+            $lines[] = "  <fg=gray># {$shortDescription}</>";
+
+            // ENV VARS (name in cyan, value in gray)
+            $envVars = '';
+            foreach (array_keys(\defined("{$class}::ENV_VARS") ? $class::ENV_VARS : []) as $envVar) {
+                $envVars .= "<fg=cyan>{$envVar}</><fg=gray>=…</> ";
+            }
+
+            // Command name (in green)
+            $commandName = "<fg=green>{$name}</>";
+
+            // Options (name in cyan, value in gray)
+            $options = '';
+            foreach ($command->getDefinition()->getOptions() as $option) {
+                if (\in_array($option->getName(), $globalOptionNames, true)) {
+                    continue;
+                }
+
+                $options .= " <fg=cyan>--{$option->getName()}</><fg=gray>=…</>";
+            }
+
+            $lines[] = "  {$envVars}{$commandName}{$options}";
         }
 
         return implode("\n", $lines);
     }
 
+    #[\Override]
     public function doRun(InputInterface $input, OutputInterface $output): int
     {
-        // Command provided, or a built-in flag like --version/-V: delegate to Symfony
         if (
             null !== $this->getCommandName($input)
             || $input->hasParameterOption(['--version', '-V'], true)
@@ -68,19 +126,7 @@ final class DtkCli extends Application
             return parent::doRun($input, $output);
         }
 
-        // No command provided, display help (logo, slogan, dtk commands)
         $output->writeln($this->getHelp());
-        $output->writeln('<fg=yellow>Available commands:</>');
-        foreach ($this->all() as $command) {
-            // Skip Symfony default commands (help, list, _complete, completion)
-            // which are added by Application::__construct() and cannot be filtered in dtk
-            if (!str_starts_with($command::class, 'Ssc\\Dtk\\')) {
-                continue;
-            }
-
-            $padded = str_pad($command->getName() ?? '', 35);
-            $output->writeln("  <info>{$padded}</info> {$command->getDescription()}");
-        }
 
         return Command::SUCCESS;
     }

@@ -1,0 +1,12 @@
+monolog:
+    handlers:
+        console:
+            type: console
+            level: info
+            formatter: Ssc\Dtk\Infrastructure\Symfony\DtkConsoleLogFormatter
+
+when@test:
+    monolog:
+        handlers:
+            stderr:
+                type: 'null'
