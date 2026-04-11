@@ -60,24 +60,24 @@ class Dtk < Formula
 
   on_macos do
     on_intel do
-      url "https://github.com/ssc-php/dtk/releases/download/v\#{version}/dtk-macos-x86_64"
+      url "https://github.com/ssc-php/dtk/releases/download/v#{version}/dtk-macos-x86_64"
       sha256 "${_SHA_MACOS_X86}"
     end
 
     on_arm do
-      url "https://github.com/ssc-php/dtk/releases/download/v\#{version}/dtk-macos-aarch64"
+      url "https://github.com/ssc-php/dtk/releases/download/v#{version}/dtk-macos-aarch64"
       sha256 "${_SHA_MACOS_ARM}"
     end
   end
 
   on_linux do
     on_intel do
-      url "https://github.com/ssc-php/dtk/releases/download/v\#{version}/dtk-linux-x86_64"
+      url "https://github.com/ssc-php/dtk/releases/download/v#{version}/dtk-linux-x86_64"
       sha256 "${_SHA_LINUX_X86}"
     end
 
     on_arm do
-      url "https://github.com/ssc-php/dtk/releases/download/v\#{version}/dtk-linux-aarch64"
+      url "https://github.com/ssc-php/dtk/releases/download/v#{version}/dtk-linux-aarch64"
       sha256 "${_SHA_LINUX_ARM}"
     end
   end
@@ -87,7 +87,7 @@ class Dtk < Formula
   end
 
   test do
-    assert_match version.to_s, shell_output("\#{bin}/dtk --version")
+    assert_match version.to_s, shell_output("#{bin}/dtk --version")
   end
 end
 FORMULA
