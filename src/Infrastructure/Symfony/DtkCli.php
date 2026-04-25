@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ssc\Dtk\Infrastructure\Symfony;
 
 use Ssc\Dtk\UserInterface\Cli\TokensSaveCommand;
+use Ssc\Dtk\UserInterface\Cli\WorkStartCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -32,6 +33,7 @@ final class DtkCli extends Application
     /** @var array<string, class-string> */
     public const array COMMANDS = [
         TokensSaveCommand::NAME => TokensSaveCommand::class,
+        WorkStartCommand::NAME => WorkStartCommand::class,
     ];
 
     /** @var array<string> */
