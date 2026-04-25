@@ -12,6 +12,9 @@ use Ssc\Dtk\Domain\Exception\ServerErrorException;
 use Ssc\Dtk\Domain\Token\File\FileReadTokens;
 use Ssc\Dtk\Tests\Fixtures\Domain\Token\ServiceFixture;
 use Ssc\Dtk\Tests\Fixtures\Domain\Token\TokenFixture;
+use Ssc\Dtk\Tests\Fixtures\Infrastructure\Filesystem\Mktemp;
+use Ssc\Dtk\Tests\Fixtures\Infrastructure\Filesystem\MkTempFilename;
+use Ssc\Dtk\Tests\Fixtures\Infrastructure\Filesystem\Rmdir;
 
 #[CoversClass(FileReadTokens::class)]
 final class FileReadTokensTest extends TestCase
@@ -19,7 +22,7 @@ final class FileReadTokensTest extends TestCase
     #[TestDox('It returns tokens when: directory does not exist (`[]`)')]
     public function test_it_returns_tokens_when_directory_does_not_exist(): void
     {
-        $configDir = sys_get_temp_dir().'/dtk-test-'.uniqid();
+        $configDir = MkTempFilename::run();
 
         $this->assertSame([], new FileReadTokens($configDir)->get());
     }
@@ -27,12 +30,11 @@ final class FileReadTokensTest extends TestCase
     #[TestDox('It returns tokens when: file does not exist (`[]`)')]
     public function test_it_returns_tokens_when_file_does_not_exist(): void
     {
-        $configDir = sys_get_temp_dir().'/dtk-test-'.uniqid();
-        mkdir($configDir, 0o700, true);
+        $configDir = Mktemp::run();
 
         $this->assertSame([], new FileReadTokens($configDir)->get());
 
-        rmdir($configDir);
+        Rmdir::run($configDir);
     }
 
     /** @param array<string, string> $tokens */
@@ -42,12 +44,12 @@ final class FileReadTokensTest extends TestCase
         string $scenario,
         array $tokens,
     ): void {
-        $configDir = sys_get_temp_dir().'/dtk-test-'.uniqid();
-        mkdir($configDir, 0o700, true);
+        $configDir = Mktemp::run();
         file_put_contents("{$configDir}/tokens.json", json_encode($tokens));
+
         $this->assertSame($tokens, new FileReadTokens($configDir)->get());
-        unlink("{$configDir}/tokens.json");
-        rmdir($configDir);
+
+        Rmdir::run($configDir);
     }
 
     /**
@@ -78,32 +80,28 @@ final class FileReadTokensTest extends TestCase
     #[TestDox('It fails when: file cannot be read')]
     public function test_it_fails_when_file_is_not_readable(): void
     {
-        $configDir = sys_get_temp_dir().'/dtk-test-'.uniqid();
-        mkdir($configDir, 0o700, true);
+        $configDir = Mktemp::run();
         mkdir("{$configDir}/tokens.json"); // directory at file path makes file_get_contents fail
 
         $this->expectException(ServerErrorException::class);
         try {
             new FileReadTokens($configDir)->get();
         } finally {
-            rmdir("{$configDir}/tokens.json");
-            rmdir($configDir);
+            Rmdir::run($configDir);
         }
     }
 
     #[TestDox('It fails when: file contains invalid data (`not valid json`)')]
     public function test_it_fails_when_file_contains_invalid_data(): void
     {
-        $configDir = sys_get_temp_dir().'/dtk-test-'.uniqid();
-        mkdir($configDir, 0o700, true);
+        $configDir = Mktemp::run();
         file_put_contents("{$configDir}/tokens.json", 'not valid json');
 
         $this->expectException(ServerErrorException::class);
         try {
             new FileReadTokens($configDir)->get();
         } finally {
-            unlink("{$configDir}/tokens.json");
-            rmdir($configDir);
+            Rmdir::run($configDir);
         }
     }
 
@@ -113,15 +111,14 @@ final class FileReadTokensTest extends TestCase
         string $scenario,
         string $content,
     ): void {
-        $configDir = sys_get_temp_dir().'/dtk-test-'.uniqid();
-        mkdir($configDir, 0o700, true);
+        $configDir = Mktemp::run();
         file_put_contents("{$configDir}/tokens.json", $content);
+
         $this->expectException(ServerErrorException::class);
         try {
             new FileReadTokens($configDir)->get();
         } finally {
-            unlink("{$configDir}/tokens.json");
-            rmdir($configDir);
+            Rmdir::run($configDir);
         }
     }
 
