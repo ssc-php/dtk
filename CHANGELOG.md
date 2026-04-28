@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-04-28
+
+### Fixed
+- fix boot errors displaying as HTML instead of a clean CLI message
+
+### Changed
+- reduce PHAR size by ~27% (2.11MB to 1.55MB) by enabling PHP and JSON compactors in Box
+
 ## [0.3.0] - 2026-04-28
 
 ### Added
@@ -26,7 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add `dtk` app
 - add `dtk --version` flag
 
-[Unreleased]: https://github.com/ssc-php/dtk/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/ssc-php/dtk/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/ssc-php/dtk/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/ssc-php/dtk/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/ssc-php/dtk/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/ssc-php/dtk/releases/tag/v0.1.0
