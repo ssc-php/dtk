@@ -12,6 +12,9 @@ use Ssc\Dtk\Domain\Exception\ServerErrorException;
 use Ssc\Dtk\Domain\Token\File\FileWriteTokens;
 use Ssc\Dtk\Tests\Fixtures\Domain\Token\ServiceFixture;
 use Ssc\Dtk\Tests\Fixtures\Domain\Token\TokenFixture;
+use Ssc\Dtk\Tests\Fixtures\Infrastructure\Filesystem\Mktemp;
+use Ssc\Dtk\Tests\Fixtures\Infrastructure\Filesystem\MkTempFilename;
+use Ssc\Dtk\Tests\Fixtures\Infrastructure\Filesystem\Rmdir;
 
 #[CoversClass(FileWriteTokens::class)]
 final class FileWriteTokensTest extends TestCase
@@ -25,15 +28,14 @@ final class FileWriteTokensTest extends TestCase
         string $scenario,
         \Closure $assert,
     ): void {
-        $configDir = sys_get_temp_dir().'/dtk-test-'.uniqid();
+        $configDir = MkTempFilename::run();
         $tokens = [ServiceFixture::makeString() => TokenFixture::makeString()];
 
         new FileWriteTokens($configDir)->save($tokens);
 
         $assert($configDir, $tokens);
 
-        unlink("{$configDir}/tokens.json");
-        rmdir($configDir);
+        Rmdir::run($configDir);
     }
 
     /**
@@ -77,16 +79,14 @@ final class FileWriteTokensTest extends TestCase
         string $scenario,
         \Closure $assert,
     ): void {
-        $configDir = sys_get_temp_dir().'/dtk-test-'.uniqid();
+        $configDir = Mktemp::run();
         $tokens = [ServiceFixture::makeString() => TokenFixture::makeString()];
-        mkdir($configDir, 0o700, true);
 
         new FileWriteTokens($configDir)->save($tokens);
 
         $assert($configDir, $tokens);
 
-        unlink("{$configDir}/tokens.json");
-        rmdir($configDir);
+        Rmdir::run($configDir);
     }
 
     /**
@@ -121,7 +121,7 @@ final class FileWriteTokensTest extends TestCase
         string $scenario,
         array $tokens,
     ): void {
-        $configDir = sys_get_temp_dir().'/dtk-test-'.uniqid();
+        $configDir = MkTempFilename::run();
 
         new FileWriteTokens($configDir)->save($tokens);
 
@@ -129,8 +129,7 @@ final class FileWriteTokensTest extends TestCase
         $content = json_decode((string) file_get_contents("{$configDir}/tokens.json"), true);
         $this->assertSame($tokens, $content);
 
-        unlink("{$configDir}/tokens.json");
-        rmdir($configDir);
+        Rmdir::run($configDir);
     }
 
     /**
@@ -166,8 +165,7 @@ final class FileWriteTokensTest extends TestCase
         string $initialContent,
         array $tokens,
     ): void {
-        $configDir = sys_get_temp_dir().'/dtk-test-'.uniqid();
-        mkdir($configDir, 0o700, true);
+        $configDir = Mktemp::run();
         file_put_contents("{$configDir}/tokens.json", $initialContent);
 
         new FileWriteTokens($configDir)->save($tokens);
@@ -176,8 +174,7 @@ final class FileWriteTokensTest extends TestCase
         $content = json_decode((string) file_get_contents("{$configDir}/tokens.json"), true);
         $this->assertSame($tokens, $content);
 
-        unlink("{$configDir}/tokens.json");
-        rmdir($configDir);
+        Rmdir::run($configDir);
     }
 
     /**
@@ -206,30 +203,28 @@ final class FileWriteTokensTest extends TestCase
     #[TestDox('It fails when: directory cannot be created')]
     public function test_it_fails_when_directory_cannot_be_created(): void
     {
-        $configDir = sys_get_temp_dir().'/dtk-test-'.uniqid();
+        $configDir = MkTempFilename::run();
         file_put_contents($configDir, ''); // file at directory path makes mkdir fail
 
         $this->expectException(ServerErrorException::class);
         try {
             new FileWriteTokens($configDir)->save([]);
         } finally {
-            unlink($configDir);
+            Rmdir::run($configDir);
         }
     }
 
     #[TestDox('It fails when: file cannot be written')]
     public function test_it_fails_when_file_cannot_be_written(): void
     {
-        $configDir = sys_get_temp_dir().'/dtk-test-'.uniqid();
-        mkdir($configDir, 0o700, true);
+        $configDir = Mktemp::run();
         mkdir("{$configDir}/tokens.json"); // directory at file path makes file_put_contents fail
 
         $this->expectException(ServerErrorException::class);
         try {
             new FileWriteTokens($configDir)->save([]);
         } finally {
-            rmdir("{$configDir}/tokens.json");
-            rmdir($configDir);
+            Rmdir::run($configDir);
         }
     }
 }

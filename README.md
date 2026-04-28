@@ -17,10 +17,10 @@ improving Developer eXperience so we can get back to the actual baking.
 
 ## Features
 
-* [ ] **Create a branch** from a ticket ID or URL:
-    * Branch is automatically named from the ticket ID and slugified title
-    * Dev is automatically assigned to the ticket
-    * Ticket is automatically moved to WIP
+* [/] **Create a branch** from a ticket ID or URL (`work:start`):
+    * [/] Branch is automatically named from the ticket ID and slugified title
+    * [ ] Dev is automatically assigned to the ticket
+    * [ ] Ticket is automatically moved to WIP
 * [ ] **Open a PR** based on the current branch:
     * PR title and description are automatically generated from commits and ticket metadata, with the ticket ID and link included
     * Ticket is automatically moved to In Review
@@ -183,7 +183,7 @@ Further documentation can be found in:
 
 * [`docs/how-to/`](docs/how-to/): how-to guides
     * [`development/`](docs/how-to/development/): local development (e.g. `001-how-to-run-qa.md`)
-    * [`usage/`](docs/how-to/usage/): using DTK (e.g. `000-how-to-set-reset-rotate-tokens.md`)
+    * [`usage/`](docs/how-to/usage/): using DTK (e.g. `001-how-to-start-work.md`)
 * [`docs/reference/`](docs/reference/): reference docs
     * `000-token-storage.md`: storage backends, commands, security properties
 

@@ -14,6 +14,8 @@ use Ssc\Dtk\Domain\Token\File\FileSaveToken;
 use Ssc\Dtk\Domain\Token\File\FileWriteTokens;
 use Ssc\Dtk\Tests\Fixtures\Domain\Token\ServiceFixture;
 use Ssc\Dtk\Tests\Fixtures\Domain\Token\TokenFixture;
+use Ssc\Dtk\Tests\Fixtures\Infrastructure\Filesystem\MkTempFilename;
+use Ssc\Dtk\Tests\Fixtures\Infrastructure\Filesystem\Rmdir;
 
 #[CoversClass(FileSaveToken::class)]
 final class FileSaveTokenTest extends TestCase
@@ -27,7 +29,7 @@ final class FileSaveTokenTest extends TestCase
     #[TestDox("It always supports the current context (it's a fallback)")]
     public function test_it_always_supports_the_current_context(): void
     {
-        $configDir = sys_get_temp_dir().'/dtk-test-'.uniqid();
+        $configDir = MkTempFilename::run();
 
         $fileSaveToken = new FileSaveToken(
             new FileReadTokens($configDir),
@@ -43,7 +45,7 @@ final class FileSaveTokenTest extends TestCase
     #[TestDox('It saves token to file')]
     public function test_it_saves_token_to_file(): void
     {
-        $configDir = sys_get_temp_dir().'/dtk-test-'.uniqid();
+        $configDir = MkTempFilename::run();
         $service = ServiceFixture::make();
         $token = TokenFixture::make();
 
@@ -60,7 +62,6 @@ final class FileSaveTokenTest extends TestCase
 
         $this->assertSame([$service->toString() => $token->toString()], $content);
 
-        unlink("{$configDir}/tokens.json");
-        rmdir($configDir);
+        Rmdir::run($configDir);
     }
 }

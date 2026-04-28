@@ -17,6 +17,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
 # Install dependencies:
 # * bash: for shell access and scripting
 # * curl: for downloading build tools (box, micro.sfx)
+# * git: for ProcessGit integration tests, which create real temp repos
 # * libzip-dev: for composer packages that use ZIP archives
 # _Note (Alpine)_: `--no-cache` includes `--update` and keeps image size minimal
 #
@@ -27,6 +28,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1 \
 RUN apk add --update --no-cache \
         bash \
         curl \
+        git \
         libzip-dev \
         unzip
 
