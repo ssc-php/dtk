@@ -4,6 +4,10 @@
     "output": "build/dtk.phar",
     "compression": "GZ",
     "check-requirements": false,
+    "compactors": [
+        "KevinGH\\Box\\Compactor\\Php",
+        "KevinGH\\Box\\Compactor\\Json"
+    ],
     "directories": [
         "config",
         "src",
