@@ -9,6 +9,7 @@ use Ssc\Dtk\UserInterface\Cli\WorkStartCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -17,6 +18,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class DtkCli extends Application
 {
+    public function __construct(string $name = 'UNKNOWN', string $version = 'UNKNOWN')
+    {
+        parent::__construct($name, $version);
+        $this->setCatchErrors(true);
+    }
+
     /**
      * Width x Height: 12 x 5.
      *
@@ -116,6 +123,13 @@ final class DtkCli extends Application
         }
 
         return implode("\n", $lines);
+    }
+
+    #[\Override]
+    public function renderThrowable(\Throwable $e, OutputInterface $output): void
+    {
+        $errorOutput = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
+        $errorOutput->writeln("<error> [ERROR] DTK failed: {$e->getMessage()} </error>");
     }
 
     #[\Override]

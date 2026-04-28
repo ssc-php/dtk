@@ -21,21 +21,26 @@ if (!is_file(__DIR__.'/vendor/autoload_runtime.php')) {
 require_once __DIR__.'/vendor/autoload_runtime.php';
 
 return static function (array $context): DtkCli {
-    $kernel = new AppKernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
-    $application = new Application($kernel);
+    try {
+        $kernel = new AppKernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+        $application = new Application($kernel);
 
-    // Register only DTK commands (listed in DtkCli::COMMANDS),
-    // excluding Symfony framework commands (cache:clear, debug:*, etc.).
-    $dtk = new DtkCli('dtk', Version::VERSION);
-    foreach (array_keys(DtkCli::COMMANDS) as $name) {
-        $dtk->addCommand($application->get($name));
+        // Register only DTK commands (listed in DtkCli::COMMANDS),
+        // excluding Symfony framework commands (cache:clear, debug:*, etc.).
+        $dtk = new DtkCli('dtk', Version::VERSION);
+        foreach (array_keys(DtkCli::COMMANDS) as $name) {
+            $dtk->addCommand($application->get($name));
+        }
+
+        // Wire up the event dispatcher so that monolog's ConsoleHandler can capture the output
+        $dtk->setDispatcher($kernel->getContainer()->get('event_dispatcher'));
+
+        // Replace Symfony HelpCommand with our own, to customise the output
+        $dtk->addCommand(new DtkHelpCommand(new DtkCommandDescriptor(), $dtk));
+
+        return $dtk;
+    } catch (\Throwable $e) {
+        fwrite(STDERR, "[ERROR] DTK failed to start: {$e->getMessage()}\n");
+        exit(1);
     }
-
-    // Wire up the event dispatcher so that monolog's ConsoleHandler can capture the output
-    $dtk->setDispatcher($kernel->getContainer()->get('event_dispatcher'));
-
-    // Replace Symfony HelpCommand with our own, to customise the output
-    $dtk->addCommand(new DtkHelpCommand(new DtkCommandDescriptor(), $dtk));
-
-    return $dtk;
 };

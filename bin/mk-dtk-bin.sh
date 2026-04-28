@@ -57,6 +57,7 @@ echo '  // Compiling environment variables...'
 php bin/mk-dtk-bin/dump-env-prod.php
 
 echo '  // Warming up Symfony cache...'
+bin/sfcc-if-stale.sh prod
 APP_ENV=prod APP_DEBUG=0 php bin/console cache:warmup --quiet
 
 echo '  // Building PHAR...'
