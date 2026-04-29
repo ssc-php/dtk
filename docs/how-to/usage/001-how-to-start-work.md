@@ -16,7 +16,8 @@ DTK can replace placeholders in the branch name:
 
 * `{ticket_id}`: with the value of `--ticket-id`
 
-If you omit `--new-branch`, DTK will prompt for it interactively.
+If you omit `--new-branch`, DTK will exit with an error.
+Pass `--interactive` to be prompted for it instead.
 
 ## Specify a starting point
 

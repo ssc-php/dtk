@@ -59,7 +59,7 @@ final class DtkCli extends Application
      *  ████  ████   in one coherent flow.
      *    ██████
      *
-     *   [INFO] Omit any option or env var to be prompted for it interactively.
+     *   [INFO] Pass --interactive to be prompted for missing options.
      *
      * Available commands:
      *   # Save token to allow DTK to access a service (Github, YouTrack, etc)
@@ -84,9 +84,9 @@ final class DtkCli extends Application
             $lines[$sloganMarginTop + $i] .= "{$sloganMarginLeft}{$styleOpen}{$sloganLine}{$styleClose}";
         }
 
-        // INFO about interractive questions
+        // INFO about interactive mode
         $lines[] = '';
-        $lines[] = '<fg=blue>  [INFO] Omit any option or env var to be prompted for it interactively.</>';
+        $lines[] = '<fg=blue>  [INFO] Pass --interactive to be prompted for missing options.</>';
         $lines[] = '';
 
         // List of DTK commands
@@ -113,6 +113,9 @@ final class DtkCli extends Application
             $options = '';
             foreach ($command->getDefinition()->getOptions() as $option) {
                 if (\in_array($option->getName(), $globalOptionNames, true)) {
+                    continue;
+                }
+                if ('interactive' === $option->getName()) {
                     continue;
                 }
 

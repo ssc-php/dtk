@@ -14,5 +14,7 @@ The versioning is inspired by [Semantic Versioning](http://semver.org/):
 
 ### Public API
 
-Classes and methods marked with the `@api` tag are considered to be the public
-API of this project.
+The public API of this project is the CLI: the commands, options, and behaviour
+documented under `docs/how-to/usage/`. Anything documented there is considered
+stable. A BC break is any change to a documented command name, option, or
+behaviour, visible as a change to those doc files in the diff.
