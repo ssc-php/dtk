@@ -6,5 +6,5 @@ namespace Ssc\Dtk\Infrastructure\Symfony;
 
 final class Version
 {
-    public const string VERSION = '0.3.2';
+    public const string VERSION = '0.4.0';
 }
