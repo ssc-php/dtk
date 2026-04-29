@@ -14,7 +14,7 @@
         "symfony/dotenv": "^8.0.8",
         "symfony/framework-bundle": "^8.0.8",
         "symfony/monolog-bundle": "^4.0.2",
-        "symfony/process": "^8.0",
+        "symfony/process": "^8.0.8",
         "symfony/runtime": "^8.0.8",
         "symfony/yaml": "^8.0.8"
     },
@@ -23,7 +23,7 @@
         "phpspec/prophecy-phpunit": "^2.5",
         "phpunit/phpunit": "^13.1.7",
         "jangregor/phpstan-prophecy": "^2.3",
-        "phpstan/phpstan": "^2.1.51",
+        "phpstan/phpstan": "^2.1.53",
         "rector/rector": "^2.4.2",
         "rector/swiss-knife": "^2.3.5"
     },
