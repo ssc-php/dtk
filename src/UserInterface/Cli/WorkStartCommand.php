@@ -23,6 +23,9 @@ final readonly class WorkStartCommand
     Create a new git branch.
     TXT;
 
+    /** @var list<string> */
+    public const array REQUIRED_OPTIONS = ['new-branch'];
+
     public function __construct(
         private WorkStartHandler $workStartHandler,
     ) {

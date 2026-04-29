@@ -110,16 +110,20 @@ final class DtkCli extends Application
             $commandName = "<fg=green>{$name}</>";
 
             // Options (name in cyan, value in gray)
+            $requiredOptions = \defined("{$class}::REQUIRED_OPTIONS") ? $class::REQUIRED_OPTIONS : [];
             $options = '';
             foreach ($command->getDefinition()->getOptions() as $option) {
                 if (\in_array($option->getName(), $globalOptionNames, true)) {
                     continue;
                 }
+
                 if ('interactive' === $option->getName()) {
                     continue;
                 }
 
-                $options .= " <fg=cyan>--{$option->getName()}</><fg=gray>=…</>";
+                $options .= \in_array($option->getName(), $requiredOptions, true)
+                    ? " <fg=cyan>--{$option->getName()}</><fg=gray>=…</>"
+                    : " [<fg=cyan>--{$option->getName()}</><fg=gray>=…</>]";
             }
 
             $lines[] = "  {$envVars}{$commandName}{$options}";

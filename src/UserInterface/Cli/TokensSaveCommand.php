@@ -29,6 +29,9 @@ final class TokensSaveCommand extends Command
     These are stored in the OS keyring (or if not found, in the filesystem).
     TXT;
 
+    /** @var list<string> */
+    public const array REQUIRED_OPTIONS = ['service'];
+
     /** @var array<string, string> name => description */
     public const array ENV_VARS = [
         'DTK_TOKEN' => 'The service token to store (e.g. for Github: Personal Access Token)',
