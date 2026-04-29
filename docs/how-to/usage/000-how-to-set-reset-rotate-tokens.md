@@ -6,22 +6,21 @@ Here's how to manage them.
 
 ## Save a token
 
-Run the command to set, reset, or rotate a token (DTK always overwrites the existing entry):
-
-```console
-dtk tokens:save --service=youtrack
-```
-
-DTK will prompt for the token with hidden input. The token never touches the
-command line or the environment, so it does not appear in shell history or
-the process list.
-
-Alternatively (less safe), pass it via the `DTK_TOKEN` env var (for CI pipelines and
-non-interactive contexts):
+Run the command to set, reset, or rotate a token (DTK always overwrites the existing entry),
+passing the token via the `DTK_TOKEN` env var:
 
 ```console
 DTK_TOKEN=<your-token> dtk tokens:save --service=youtrack
 ```
+
+To be prompted for the token with hidden input instead, pass `--interactive`:
+
+```console
+dtk tokens:save --service=youtrack --interactive
+```
+
+The hidden-input path is safer because the token never touches the command line,
+so it does not appear in shell history or the process list.
 
 > **Warning:** inline env vars are recorded in shell history and visible to
 > other processes for the duration of the command.

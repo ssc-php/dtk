@@ -25,16 +25,16 @@ final class DtkCommandDescriptor extends TextDescriptor
      *
      *   These are stored in the OS keyring (or if not found, in the filesystem).
      *
-     *   [INFO] Omit any option or env var to be prompted for it interactively.
+     *   [INFO] Pass --interactive to be prompted for missing options.
      *
-     * Usage:
+     * Synopsis:
      *   DTK_TOKEN=… tokens:save --service=…
      *
      * Environment Variables:
      *   DTK_TOKEN=…  The service token to store (e.g. for Github: Personal Access Token)
      *
      * Options:
-     *       --service=…  Service name (one of: youtrack)
+     *   --service=…  Service name (one of: youtrack)
      *   -h, --help       Display help for the given command.
      *   ...              (global options shown with -v)
      * ```
@@ -42,10 +42,10 @@ final class DtkCommandDescriptor extends TextDescriptor
      * When there are more than 3 env vars or options, they are split into groups of 3, one per line:
      *
      * ```
-     * Usage:
-     *   DTK_TOKEN=… tokens:save --service=… --help --silent \
-     *     --quiet --verbose --version \
-     *     --ansi
+     * Synopsis:
+     *   DTK_TOKEN=… tokens:save --service=… [--help] [--silent] \
+     *     [--quiet] [--verbose] [--version] \
+     *     [--ansi]
      * ```
      *
      * @param array<string, mixed> $options
@@ -70,17 +70,18 @@ final class DtkCommandDescriptor extends TextDescriptor
 
         $lines[] = '';
 
-        // INFO about interractive questions
-        $lines[] = '  <fg=blue>[INFO] Omit any option or env var to be prompted for it interactively.</>';
+        // INFO about interactive mode
+        $lines[] = '  <fg=blue>[INFO] Pass --interactive to be prompted for missing options.</>';
         $lines[] = '';
 
-        // Usage: `ENVVAR=… command --option=…`
-        $lines[] = '<fg=magenta>Usage:</>';
+        // Synopsis: ENVVAR=… command --option=…
+        $lines[] = '<fg=magenta>Synopsis:</>';
 
         // ENV VARS
-        $commandClass = $command::class;
+        $commandClass = DtkCli::COMMANDS[$command->getName() ?? ''] ?? $command::class;
         /** @var array<string, string> $envVars */
         $envVars = \defined("{$commandClass}::ENV_VARS") ? $commandClass::ENV_VARS : [];
+        $requiredOptions = \defined("{$commandClass}::REQUIRED_OPTIONS") ? $commandClass::REQUIRED_OPTIONS : [];
         $envVarNames = array_keys($envVars);
         $envVarTokens = [];
         foreach ($envVarNames as $envVarName) {
@@ -106,6 +107,7 @@ final class DtkCommandDescriptor extends TextDescriptor
         $options = $this->output->isVerbose()
             ? $command->getDefinition()->getOptions() // Global options (--help, --debug, etc), only shown in verbose move (-v)
             : $command->getNativeDefinition()->getOptions(); // Just the command's options
+        unset($options['interactive']);
         $optionTokens = [];
         foreach ($options as $optionName => $inputOption) {
             $shortcut = $inputOption->getShortcut() ?: '';
@@ -115,7 +117,9 @@ final class DtkCommandDescriptor extends TextDescriptor
             $valueSuffix = $inputOption->acceptValue()
                 ? '<fg=gray>=…</>'
                 : '';
-            $optionTokens[] = "{$shortcutPrefix}<fg=cyan>--{$optionName}</>{$valueSuffix}";
+            $optionTokens[] = \in_array($optionName, $requiredOptions, true)
+                ? "{$shortcutPrefix}<fg=cyan>--{$optionName}</>{$valueSuffix}"
+                : "[{$shortcutPrefix}<fg=cyan>--{$optionName}</>{$valueSuffix}]";
         }
 
         // Up to 3 per line:

@@ -23,6 +23,9 @@ final readonly class WorkStartCommand
     Create a new git branch.
     TXT;
 
+    /** @var list<string> */
+    public const array REQUIRED_OPTIONS = ['new-branch'];
+
     public function __construct(
         private WorkStartHandler $workStartHandler,
     ) {
@@ -38,10 +41,14 @@ final readonly class WorkStartCommand
         string $ticketId = '',
         #[Option(description: 'Stash uncommitted changes before checkout and restore afterwards')]
         bool $autostash = false,
+        #[Option(description: 'Prompt for missing options interactively')]
+        bool $interactive = false,
     ): int {
+        $newBranch = $this->askNewBranch($io, $newBranch, $interactive);
         if ('' === $newBranch) {
-            $entered = $io->ask('new-branch');
-            $newBranch = \is_string($entered) ? $entered : '';
+            $io->error('Missing required option: --new-branch');
+
+            return Command::INVALID;
         }
 
         $this->workStartHandler->handle(new WorkStart(
@@ -54,5 +61,16 @@ final readonly class WorkStartCommand
         $io->success('Work started');
 
         return Command::SUCCESS;
+    }
+
+    private function askNewBranch(SymfonyStyle $io, string $newBranch, bool $interactive): string
+    {
+        if ('' !== $newBranch || !$interactive) {
+            return $newBranch;
+        }
+
+        $entered = $io->ask('new-branch');
+
+        return \is_string($entered) ? $entered : '';
     }
 }
