@@ -110,13 +110,13 @@ final class TokensSaveCommandTest extends TestCase
     }
 
     /**
-     * @param array<string, string> $input
-     * @param list<string>          $interractiveInputs
-     * @param array<string, string> $envVars
+     * @param array<string, string|bool> $input
+     * @param list<string>               $interractiveInputs
+     * @param array<string, string>      $envVars
      */
     #[DataProvider('promptsProvider')]
-    #[TestDox('It asks for missing option value: $scenario')]
-    public function test_it_asks_for_missing_option_value(
+    #[TestDox('It prompts for missing value with --interactive: $scenario')]
+    public function test_it_prompts_for_missing_value_with_interactive(
         string $scenario,
         array $input,
         array $interractiveInputs,
@@ -143,7 +143,7 @@ final class TokensSaveCommandTest extends TestCase
     /**
      * @return \Iterator<array{
      *     scenario: string,
-     *     input: array<string, string>,
+     *     input: array<string, string|bool>,
      *     interractiveInputs: list<string>,
      *     envVars?: array<string, string>,
      * }>
@@ -154,60 +154,31 @@ final class TokensSaveCommandTest extends TestCase
             'scenario' => '--service',
             'input' => [
                 'command' => TokensSaveCommand::NAME,
+                '--interactive' => true,
             ],
-            'interractiveInputs' => [
-                ServiceFixture::makeString(),
-            ],
+            'interractiveInputs' => [ServiceFixture::makeString()],
             'envVars' => ['DTK_TOKEN' => TokenFixture::makeString()],
         ];
-    }
-
-    /**
-     * @param list<string> $interractiveInputs
-     */
-    #[DataProvider('envVarPromptsProvider')]
-    #[TestDox('It asks for missing env var value: $scenario')]
-    public function test_it_asks_for_missing_env_var_value(
-        string $scenario,
-        array $interractiveInputs,
-    ): void {
-        $application = TestKernelSingleton::get()->application();
-        $application->setInputs($interractiveInputs);
-
-        $application->run([
-            'command' => TokensSaveCommand::NAME,
-            '--service' => ServiceFixture::makeString(),
-        ]);
-
-        $application->setInputs([]);
-        $this->assertSame(Command::SUCCESS, $application->getStatusCode());
-    }
-
-    /**
-     * @return \Iterator<array{
-     *     scenario: string,
-     *     interractiveInputs: list<string>,
-     * }>
-     */
-    public static function envVarPromptsProvider(): \Iterator
-    {
         yield [
             'scenario' => 'DTK_TOKEN',
+            'input' => [
+                'command' => TokensSaveCommand::NAME,
+                '--service' => ServiceFixture::makeString(),
+                '--interactive' => true,
+            ],
             'interractiveInputs' => [TokenFixture::makeString()],
         ];
     }
 
     /**
      * @param array<string, string> $input
-     * @param list<string>          $interractiveInputs
      * @param array<string, string> $envVars
      */
-    #[DataProvider('invalidInputProvider')]
-    #[TestDox('It fails on invalid input: $scenario')]
-    public function test_it_fails_on_invalid_input(
+    #[DataProvider('missingRequiredOptionProvider')]
+    #[TestDox('It fails on missing required option: $scenario')]
+    public function test_it_fails_on_missing_required_option(
         string $scenario,
         array $input,
-        array $interractiveInputs = [],
         array $envVars = [],
     ): void {
         $application = TestKernelSingleton::get()->application();
@@ -216,13 +187,8 @@ final class TokensSaveCommandTest extends TestCase
             putenv("{$key}={$value}");
         }
 
-        if ([] !== $interractiveInputs) {
-            $application->setInputs($interractiveInputs);
-        }
-
         $application->run($input);
 
-        $application->setInputs([]);
         foreach (array_keys($envVars) as $key) {
             putenv($key);
         }
@@ -234,7 +200,57 @@ final class TokensSaveCommandTest extends TestCase
      * @return \Iterator<array{
      *     scenario: string,
      *     input: array<string, string>,
-     *     interractiveInputs?: list<string>,
+     *     envVars?: array<string, string>,
+     * }>
+     */
+    public static function missingRequiredOptionProvider(): \Iterator
+    {
+        yield [
+            'scenario' => '--service',
+            'input' => [
+                'command' => TokensSaveCommand::NAME,
+            ],
+            'envVars' => ['DTK_TOKEN' => TokenFixture::makeString()],
+        ];
+        yield [
+            'scenario' => 'DTK_TOKEN',
+            'input' => [
+                'command' => TokensSaveCommand::NAME,
+                '--service' => ServiceFixture::makeString(),
+            ],
+        ];
+    }
+
+    /**
+     * @param array<string, string> $input
+     * @param array<string, string> $envVars
+     */
+    #[DataProvider('invalidInputProvider')]
+    #[TestDox('It fails on invalid input: $scenario')]
+    public function test_it_fails_on_invalid_input(
+        string $scenario,
+        array $input,
+        array $envVars = [],
+    ): void {
+        $application = TestKernelSingleton::get()->application();
+
+        foreach ($envVars as $key => $value) {
+            putenv("{$key}={$value}");
+        }
+
+        $application->run($input);
+
+        foreach (array_keys($envVars) as $key) {
+            putenv($key);
+        }
+
+        $this->assertSame(Command::INVALID, $application->getStatusCode());
+    }
+
+    /**
+     * @return \Iterator<array{
+     *     scenario: string,
+     *     input: array<string, string>,
      *     envVars?: array<string, string>,
      * }>
      */
@@ -247,14 +263,6 @@ final class TokensSaveCommandTest extends TestCase
                 '--service' => 'invalid',
             ],
             'envVars' => ['DTK_TOKEN' => TokenFixture::makeString()],
-        ];
-        yield [
-            'scenario' => 'DTK_TOKEN',
-            'input' => [
-                'command' => TokensSaveCommand::NAME,
-                '--service' => ServiceFixture::makeString(),
-            ],
-            'interractiveInputs' => [''],
         ];
     }
 }

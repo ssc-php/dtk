@@ -48,24 +48,30 @@ final class TokensSaveCommand extends Command
             description: 'Service name (one of: '.Service::toListString().')',
             default: '',
         );
+        $this->addOption(
+            name: 'interactive',
+            mode: InputOption::VALUE_NONE,
+            description: 'Prompt for missing options interactively',
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $symfonyStyle = new SymfonyStyle($input, $output);
+        $interactive = (bool) $input->getOption('interactive');
 
-        $rawService = $input->getOption('service');
-        $service = \is_string($rawService) ? $rawService : '';
+        $service = $this->askService($input, $symfonyStyle, $interactive);
         if ('' === $service) {
-            $choices = Service::toArray();
-            $chosen = $symfonyStyle->choice('service', $choices);
-            $service = \is_string($chosen) ? $chosen : $choices[0];
+            $symfonyStyle->error('Missing required option: --service');
+
+            return Command::INVALID;
         }
 
-        $token = getenv(array_key_first(self::ENV_VARS)) ?: '';
+        $token = $this->askToken($symfonyStyle, $interactive);
         if ('' === $token) {
-            $entered = $symfonyStyle->askHidden('token');
-            $token = \is_string($entered) ? $entered : '';
+            $symfonyStyle->error('Missing required env var: '.array_key_first(self::ENV_VARS));
+
+            return Command::INVALID;
         }
 
         try {
@@ -82,5 +88,31 @@ final class TokensSaveCommand extends Command
         $symfonyStyle->success('Token saved');
 
         return Command::SUCCESS;
+    }
+
+    private function askService(InputInterface $input, SymfonyStyle $symfonyStyle, bool $interactive): string
+    {
+        $rawService = $input->getOption('service');
+        $service = \is_string($rawService) ? $rawService : '';
+        if ('' !== $service || !$interactive) {
+            return $service;
+        }
+
+        $choices = Service::toArray();
+        $chosen = $symfonyStyle->choice('service', $choices);
+
+        return \is_string($chosen) ? $chosen : $choices[0];
+    }
+
+    private function askToken(SymfonyStyle $symfonyStyle, bool $interactive): string
+    {
+        $token = getenv(array_key_first(self::ENV_VARS)) ?: '';
+        if ('' !== $token || !$interactive) {
+            return $token;
+        }
+
+        $entered = $symfonyStyle->askHidden('token');
+
+        return \is_string($entered) ? $entered : '';
     }
 }

@@ -110,12 +110,12 @@ final class WorkStartCommandTest extends TestCase
     }
 
     /**
-     * @param array<string, string> $input
-     * @param list<string>          $interactiveInputs
+     * @param array<string, string|bool> $input
+     * @param list<string>               $interactiveInputs
      */
     #[DataProvider('promptsProvider')]
-    #[TestDox('It asks for missing option value: $scenario')]
-    public function test_it_asks_for_missing_option_value(
+    #[TestDox('It prompts for missing value with --interactive: $scenario')]
+    public function test_it_prompts_for_missing_value_with_interactive(
         string $scenario,
         array $input,
         array $interactiveInputs,
@@ -140,7 +140,7 @@ final class WorkStartCommandTest extends TestCase
     /**
      * @return \Iterator<array{
      *     scenario: string,
-     *     input: array<string, string>,
+     *     input: array<string, string|bool>,
      *     interactiveInputs: list<string>,
      * }>
      */
@@ -151,8 +151,49 @@ final class WorkStartCommandTest extends TestCase
             'input' => [
                 'command' => WorkStartCommand::NAME,
                 '--starting-point' => StartingPointFixture::makeString(),
+                '--interactive' => true,
             ],
             'interactiveInputs' => [BranchNameFixture::makeString()],
+        ];
+    }
+
+    /**
+     * @param array<string, string> $input
+     */
+    #[DataProvider('missingRequiredOptionProvider')]
+    #[TestDox('It fails on missing required option: $scenario')]
+    public function test_it_fails_on_missing_required_option(
+        string $scenario,
+        array $input,
+    ): void {
+        $repoDir = Mktemp::run();
+
+        try {
+            InitGitRepo::run($repoDir);
+
+            $application = TestKernelSingleton::get()->application();
+            $application->run($input);
+
+            $this->assertSame(Command::INVALID, $application->getStatusCode());
+        } finally {
+            Rmdir::run($repoDir);
+        }
+    }
+
+    /**
+     * @return \Iterator<array{
+     *     scenario: string,
+     *     input: array<string, string>,
+     * }>
+     */
+    public static function missingRequiredOptionProvider(): \Iterator
+    {
+        yield [
+            'scenario' => '--new-branch',
+            'input' => [
+                'command' => WorkStartCommand::NAME,
+                '--starting-point' => StartingPointFixture::makeString(),
+            ],
         ];
     }
 }
