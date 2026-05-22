@@ -17,4 +17,9 @@ final readonly class ServiceFixture
     {
         return Service::cases()[0]->value;
     }
+
+    public static function makeAnotherString(): string
+    {
+        return Service::cases()[1]->value;
+    }
 }

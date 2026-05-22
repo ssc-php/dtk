@@ -55,13 +55,16 @@ final class FileSaveTokenTest extends TestCase
             new NullLogger(),
             $configDir,
         );
-        $fileSaveToken->save($service, $token);
 
-        /** @var array<string, string> $content */
-        $content = json_decode((string) file_get_contents("{$configDir}/tokens.json"), true);
+        try {
+            $fileSaveToken->save($service, $token);
 
-        $this->assertSame([$service->toString() => $token->toString()], $content);
+            /** @var array<string, string> $content */
+            $content = json_decode((string) file_get_contents("{$configDir}/tokens.json"), true);
 
-        Rmdir::run($configDir);
+            $this->assertSame([$service->toString() => $token->toString()], $content);
+        } finally {
+            Rmdir::run($configDir);
+        }
     }
 }

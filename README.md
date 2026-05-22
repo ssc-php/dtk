@@ -20,7 +20,7 @@ improving Developer eXperience so we can get back to the actual baking.
 * [/] **Create a branch** from a ticket ID or URL (`work:start`):
     * [/] Branch is automatically named from the ticket ID and slugified title
     * [ ] Dev is automatically assigned to the ticket
-    * [ ] Ticket is automatically moved to WIP
+    * [x] Ticket is automatically moved to WIP
 * [ ] **Open a PR** based on the current branch:
     * PR title and description are automatically generated from commits and ticket metadata, with the ticket ID and link included
     * Ticket is automatically moved to In Review
@@ -35,7 +35,7 @@ improving Developer eXperience so we can get back to the actual baking.
 
 All commands are configurable to fit any workflow, with support for:
 
-* [ ] Jira
+* [x] Jira
 * [ ] Trello
 * [ ] GitHub Projects
 * [ ] JetBrains YouTrack

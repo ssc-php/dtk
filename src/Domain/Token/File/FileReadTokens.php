@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ssc\Dtk\Domain\Token\File;
 
 use Ssc\Dtk\Domain\Exception\ServerErrorException;
+use Ssc\Dtk\Domain\Exception\ValidationFailedException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class FileReadTokens
@@ -16,15 +17,17 @@ final readonly class FileReadTokens
     }
 
     /**
-     * @return array<string, string>
-     *
-     * @throws ServerErrorException If the file cannot be read or contains invalid data
+     * @throws ServerErrorException      If the file cannot be read
+     * @throws ServerErrorException      If the JSON is invalid
+     * @throws ServerErrorException      If any token value is not a string
+     * @throws ValidationFailedException If any service name is not a known service
+     * @throws ValidationFailedException If any token value is empty
      */
-    public function get(): array
+    public function read(): Tokens
     {
         $file = "{$this->dataDir}/tokens.json";
         if (!file_exists($file)) {
-            return [];
+            return Tokens::fromArray([]);
         }
 
         $content = @file_get_contents($file);
@@ -34,31 +37,20 @@ final readonly class FileReadTokens
             );
         }
 
-        $json = json_decode($content, true);
-        if (!\is_array($json)) {
+        try {
+            $decoded = json_decode($content, true, flags: \JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
             throw ServerErrorException::make(
                 "Invalid \"tokens file\" parameter: should contain valid JSON (path: `{$file}`)",
             );
         }
 
-        // Explicit assignments let PHPStan infer array<string, string>
-        $rawTokens = [];
-        foreach ($json as $rawService => $rawToken) {
-            if (!\is_string($rawService)) {
-                throw ServerErrorException::make(
-                    "Invalid \"service\" parameter: should be a string (file path: `{$file}`)",
-                );
-            }
-
-            if (!\is_string($rawToken)) {
-                throw ServerErrorException::make(
-                    "Invalid \"token\" parameter: should be a string (file path: `{$file}`, key: `{$rawService}`)",
-                );
-            }
-
-            $rawTokens[$rawService] = $rawToken;
+        if (!\is_array($decoded)) {
+            throw ServerErrorException::make(
+                "Invalid \"tokens file\" parameter: should contain valid JSON (path: `{$file}`)",
+            );
         }
 
-        return $rawTokens;
+        return Tokens::fromArray($decoded);
     }
 }

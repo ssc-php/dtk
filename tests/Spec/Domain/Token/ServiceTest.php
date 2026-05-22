@@ -35,6 +35,10 @@ final class ServiceTest extends TestCase
     public static function validValuesProvider(): \Iterator
     {
         yield [
+            'scenario' => 'jira',
+            'case' => Service::Jira,
+        ];
+        yield [
             'scenario' => 'youtrack',
             'case' => Service::Youtrack,
         ];

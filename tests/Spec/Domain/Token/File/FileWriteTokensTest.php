@@ -31,11 +31,13 @@ final class FileWriteTokensTest extends TestCase
         $configDir = MkTempFilename::run();
         $tokens = [ServiceFixture::makeString() => TokenFixture::makeString()];
 
-        new FileWriteTokens($configDir)->save($tokens);
+        try {
+            new FileWriteTokens($configDir)->save($tokens);
 
-        $assert($configDir, $tokens);
-
-        Rmdir::run($configDir);
+            $assert($configDir, $tokens);
+        } finally {
+            Rmdir::run($configDir);
+        }
     }
 
     /**
@@ -82,11 +84,13 @@ final class FileWriteTokensTest extends TestCase
         $configDir = Mktemp::run();
         $tokens = [ServiceFixture::makeString() => TokenFixture::makeString()];
 
-        new FileWriteTokens($configDir)->save($tokens);
+        try {
+            new FileWriteTokens($configDir)->save($tokens);
 
-        $assert($configDir, $tokens);
-
-        Rmdir::run($configDir);
+            $assert($configDir, $tokens);
+        } finally {
+            Rmdir::run($configDir);
+        }
     }
 
     /**
@@ -116,20 +120,22 @@ final class FileWriteTokensTest extends TestCase
 
     /** @param array<string, string> $tokens */
     #[DataProvider('tokensProvider')]
-    #[TestDox('It writes tokens: $scenario')]
+    #[TestDox('It writes tokens when: $scenario')]
     public function test_it_writes_tokens(
         string $scenario,
         array $tokens,
     ): void {
         $configDir = MkTempFilename::run();
 
-        new FileWriteTokens($configDir)->save($tokens);
+        try {
+            new FileWriteTokens($configDir)->save($tokens);
 
-        /** @var array<string, string> $content */
-        $content = json_decode((string) file_get_contents("{$configDir}/tokens.json"), true);
-        $this->assertSame($tokens, $content);
-
-        Rmdir::run($configDir);
+            /** @var array<string, string> $content */
+            $content = json_decode((string) file_get_contents("{$configDir}/tokens.json"), true);
+            $this->assertSame($tokens, $content);
+        } finally {
+            Rmdir::run($configDir);
+        }
     }
 
     /**
@@ -168,13 +174,15 @@ final class FileWriteTokensTest extends TestCase
         $configDir = Mktemp::run();
         file_put_contents("{$configDir}/tokens.json", $initialContent);
 
-        new FileWriteTokens($configDir)->save($tokens);
+        try {
+            new FileWriteTokens($configDir)->save($tokens);
 
-        /** @var array<string, string> $content */
-        $content = json_decode((string) file_get_contents("{$configDir}/tokens.json"), true);
-        $this->assertSame($tokens, $content);
-
-        Rmdir::run($configDir);
+            /** @var array<string, string> $content */
+            $content = json_decode((string) file_get_contents("{$configDir}/tokens.json"), true);
+            $this->assertSame($tokens, $content);
+        } finally {
+            Rmdir::run($configDir);
+        }
     }
 
     /**
