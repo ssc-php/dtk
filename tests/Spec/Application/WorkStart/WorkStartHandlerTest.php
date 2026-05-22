@@ -14,12 +14,18 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Ssc\Dtk\Application\WorkStart\WorkStart;
 use Ssc\Dtk\Application\WorkStart\WorkStartHandler;
 use Ssc\Dtk\Domain\Exception\ServerErrorException;
+use Ssc\Dtk\Domain\Exception\ValidationFailedException;
 use Ssc\Dtk\Domain\Git\BranchName;
 use Ssc\Dtk\Domain\Git\Command\SwitchToNewBranch;
 use Ssc\Dtk\Domain\Git\StartingPoint;
+use Ssc\Dtk\Domain\Kanban\GetKanbanTicket;
+use Ssc\Dtk\Domain\Kanban\MoveKanbanTicket;
+use Ssc\Dtk\Domain\Kanban\TicketUrl;
 use Ssc\Dtk\Domain\Template\Replace;
 use Ssc\Dtk\Tests\Fixtures\Domain\Git\BranchNameFixture;
 use Ssc\Dtk\Tests\Fixtures\Domain\Git\StartingPointFixture;
+use Ssc\Dtk\Tests\Fixtures\Domain\Kanban\TicketFixture;
+use Ssc\Dtk\Tests\Fixtures\Domain\Kanban\TicketUrlFixture;
 
 #[CoversClass(WorkStartHandler::class)]
 #[Small]
@@ -45,8 +51,19 @@ final class WorkStartHandlerTest extends TestCase
             $autostash,
         )->shouldBeCalledOnce();
 
+        $getKanbanTicket = $this->prophesize(GetKanbanTicket::class);
+        $getKanbanTicket->get(Argument::cetera())->shouldNotBeCalled();
+
+        $moveKanbanTicket = $this->prophesize(MoveKanbanTicket::class);
+        $moveKanbanTicket->move(Argument::cetera())->shouldNotBeCalled();
+
         // System under test
-        $workStartHandler = new WorkStartHandler(new Replace(), $switchToNewBranch->reveal());
+        $workStartHandler = new WorkStartHandler(
+            $getKanbanTicket->reveal(),
+            new Replace(),
+            $switchToNewBranch->reveal(),
+            $moveKanbanTicket->reveal(),
+        );
         $workStartHandler->handle(new WorkStart(
             $newBranch,
             $startingPoint,
@@ -69,47 +86,84 @@ final class WorkStartHandlerTest extends TestCase
         ];
     }
 
-    #[DataProvider('placeholderProvider')]
-    #[TestDox('It creates the branch when: newBranch contains $scenario placeholder')]
-    public function test_it_creates_the_branch_when_the_branch_name_contains_placeholders(
-        string $scenario,
-        string $branchNameTemplate,
-        string $ticketId,
-        string $expectedBranch,
-    ): void {
+    #[TestDox('It can also: use {ticket_id}, {type}, {title} placeholders in branch name')]
+    public function test_it_can_also_use_placeholders_in_branch_name(): void
+    {
         // Fixtures
         $startingPoint = StartingPointFixture::makeString();
         $autostashOff = false;
+        $ticketUrl = TicketUrlFixture::makeString();
+        $branchNameTemplate = '{type}/{ticket_id}-{title}';
+        $expectedBranch = 'bug/PRJ-4423-fix-broken-login';
 
         // Test doubles
+        $getKanbanTicket = $this->prophesize(GetKanbanTicket::class);
+        $getKanbanTicket->get(
+            Argument::that(static fn (TicketUrl $u): bool => $u->toString() === $ticketUrl),
+        )->willReturn(TicketFixture::make());
+
         $switchToNewBranch = $this->prophesize(SwitchToNewBranch::class);
         $switchToNewBranch->switch(
             Argument::that(static fn (BranchName $b): bool => $b->toString() === $expectedBranch),
-            Argument::that(static fn (StartingPoint $c): bool => $c->toString() === $startingPoint),
+            Argument::that(static fn (StartingPoint $s): bool => $s->toString() === $startingPoint),
             $autostashOff,
         )->shouldBeCalledOnce();
 
+        $moveKanbanTicket = $this->prophesize(MoveKanbanTicket::class);
+        $moveKanbanTicket->move(Argument::cetera())->shouldBeCalledOnce();
+
         // System under test
-        $workStartHandler = new WorkStartHandler(new Replace(), $switchToNewBranch->reveal());
+        $workStartHandler = new WorkStartHandler(
+            $getKanbanTicket->reveal(),
+            new Replace(),
+            $switchToNewBranch->reveal(),
+            $moveKanbanTicket->reveal(),
+        );
         $workStartHandler->handle(new WorkStart(
             $branchNameTemplate,
             $startingPoint,
-            $ticketId,
-            $autostashOff,
+            autostash: $autostashOff,
+            ticketUrl: $ticketUrl,
         ));
     }
 
-    /**
-     * @return \Iterator<array{scenario: string, branchNameTemplate: string, ticketId: string, expectedBranch: string}>
-     */
-    public static function placeholderProvider(): \Iterator
+    #[TestDox('It can also: move the ticket to In Progress')]
+    public function test_it_can_also_move_the_ticket_to_in_progress(): void
     {
-        yield [
-            'scenario' => '{ticket_id}',
-            'branchNameTemplate' => '{ticket_id}/feat/cunning-plan',
-            'ticketId' => 'PRJ-4423',
-            'expectedBranch' => 'PRJ-4423/feat/cunning-plan',
-        ];
+        // Fixtures
+        $newBranch = BranchNameFixture::makeString();
+        $startingPoint = StartingPointFixture::makeString();
+        $autostashOff = false;
+        $ticketUrl = TicketUrlFixture::makeString();
+
+        // Test doubles
+        $getKanbanTicket = $this->prophesize(GetKanbanTicket::class);
+        $getKanbanTicket->get(
+            Argument::that(static fn (TicketUrl $u): bool => $u->toString() === $ticketUrl),
+        )->willReturn(TicketFixture::make());
+
+        $switchToNewBranch = $this->prophesize(SwitchToNewBranch::class);
+        $switchToNewBranch->switch(Argument::cetera())->shouldBeCalledOnce();
+
+        $moveKanbanTicket = $this->prophesize(MoveKanbanTicket::class);
+        $moveKanbanTicket->move(
+            Argument::that(static fn (TicketUrl $u): bool => $u->toString() === $ticketUrl),
+            'In Progress',
+        )->shouldBeCalledOnce();
+
+        // System under test
+        $workStartHandler = new WorkStartHandler(
+            $getKanbanTicket->reveal(),
+            new Replace(),
+            $switchToNewBranch->reveal(),
+            $moveKanbanTicket->reveal(),
+        );
+        $workStartHandler->handle(new WorkStart(
+            $newBranch,
+            $startingPoint,
+            autostash: $autostashOff,
+            ticketUrl: $ticketUrl,
+        ));
     }
 
     #[TestDox('It fails when: there are uncommitted changes, and autostash is off')]
@@ -128,14 +182,61 @@ final class WorkStartHandlerTest extends TestCase
             $autostashOff,
         )->willThrow(ServerErrorException::class);
 
+        $getKanbanTicket = $this->prophesize(GetKanbanTicket::class);
+        $getKanbanTicket->get(Argument::cetera())->shouldNotBeCalled();
+
+        $moveKanbanTicket = $this->prophesize(MoveKanbanTicket::class);
+        $moveKanbanTicket->move(Argument::cetera())->shouldNotBeCalled();
+
         // System under test
-        $workStartHandler = new WorkStartHandler(new Replace(), $switchToNewBranch->reveal());
+        $workStartHandler = new WorkStartHandler(
+            $getKanbanTicket->reveal(),
+            new Replace(),
+            $switchToNewBranch->reveal(),
+            $moveKanbanTicket->reveal(),
+        );
 
         $this->expectException(ServerErrorException::class);
         $workStartHandler->handle(new WorkStart(
             $newBranch,
             $startingPoint,
             autostash: $autostashOff,
+        ));
+    }
+
+    #[TestDox('It fails when: the ticket is not found')]
+    public function test_it_fails_when_the_ticket_is_not_found(): void
+    {
+        // Fixtures
+        $newBranch = BranchNameFixture::makeString();
+        $startingPoint = StartingPointFixture::makeString();
+        $autostashOff = false;
+        $ticketUrl = TicketUrlFixture::makeString();
+
+        // Test doubles
+        $getKanbanTicket = $this->prophesize(GetKanbanTicket::class);
+        $getKanbanTicket->get(Argument::cetera())->willThrow(ValidationFailedException::class);
+
+        $switchToNewBranch = $this->prophesize(SwitchToNewBranch::class);
+        $switchToNewBranch->switch(Argument::cetera())->shouldNotBeCalled();
+
+        $moveKanbanTicket = $this->prophesize(MoveKanbanTicket::class);
+        $moveKanbanTicket->move(Argument::cetera())->shouldNotBeCalled();
+
+        // System under test
+        $workStartHandler = new WorkStartHandler(
+            $getKanbanTicket->reveal(),
+            new Replace(),
+            $switchToNewBranch->reveal(),
+            $moveKanbanTicket->reveal(),
+        );
+
+        $this->expectException(ValidationFailedException::class);
+        $workStartHandler->handle(new WorkStart(
+            $newBranch,
+            $startingPoint,
+            autostash: $autostashOff,
+            ticketUrl: $ticketUrl,
         ));
     }
 }

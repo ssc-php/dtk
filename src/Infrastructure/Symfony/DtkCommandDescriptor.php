@@ -81,6 +81,7 @@ final class DtkCommandDescriptor extends TextDescriptor
         $commandClass = DtkCli::COMMANDS[$command->getName() ?? ''] ?? $command::class;
         /** @var array<string, string> $envVars */
         $envVars = \defined("{$commandClass}::ENV_VARS") ? $commandClass::ENV_VARS : [];
+        /** @var list<string> $requiredOptions */
         $requiredOptions = \defined("{$commandClass}::REQUIRED_OPTIONS") ? $commandClass::REQUIRED_OPTIONS : [];
         $envVarNames = array_keys($envVars);
         $envVarTokens = [];

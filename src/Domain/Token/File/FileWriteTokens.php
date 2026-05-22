@@ -18,7 +18,8 @@ final readonly class FileWriteTokens
     /**
      * @param array<string, string> $tokens
      *
-     * @throws ServerErrorException If the directory or file cannot be written
+     * @throws ServerErrorException If the directory cannot be created
+     * @throws ServerErrorException If the file cannot be written
      */
     public function save(array $tokens): void
     {

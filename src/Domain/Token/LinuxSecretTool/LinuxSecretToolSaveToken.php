@@ -19,7 +19,7 @@ use Symfony\Component\Process\Process;
  * echo -n token | secret-tool store \  # password / secret
  *     --label 'dtk:github' \           # human-readable label (account:service)
  *     account dtk \                    # account (dtk)
- *     service github                   # service (github, jira, trello, youtrack, etc)
+ *     service github                   # service (github, jira, youtrack, etc)
  * ```
  *
  * > **Note**: token is passed safely from stdin, so it doesn't leak.

@@ -1,7 +1,7 @@
 # How to start work on a ticket
 
 Start work on a ticket by running `work:start`,
-with a templated branch name and a ticket ID:
+with a templated branch name and a ticket ID (or ticket URL):
 
 ```console
 dtk work:start --new-branch='{ticket_id}/feat/cunning-plan' --ticket-id=PRJ-4423
@@ -18,6 +18,28 @@ DTK can replace placeholders in the branch name:
 
 If you omit `--new-branch`, DTK will exit with an error.
 Pass `--interactive` to be prompted for it instead.
+
+## Use a ticket URL to auto-build the branch name and sync the board
+
+Pass a full ticket URL instead of a ticket ID to let DTK fetch the ticket
+metadata and move it to "In Progress" on the board:
+
+```console
+dtk work:start --new-branch='{ticket_id}/{type}/{title}' --ticket-url=https://company.atlassian.net/browse/PRJ-4423
+```
+
+This will:
+
+1. fetch the ticket from the Kanban board (Jira)
+2. build the branch name from the template
+3. create a new branch and switch to it
+4. move the ticket to "In Progress" on the board
+
+When `--ticket-url` is provided, three placeholders are available:
+
+* `{ticket_id}`: the ticket identifier (e.g. `PRJ-4423`)
+* `{type}`: the ticket type, slugified (e.g. `story`, `bug`)
+* `{title}`: the ticket title, slugified (e.g. `cunning-plan`)
 
 ## Specify a starting point
 

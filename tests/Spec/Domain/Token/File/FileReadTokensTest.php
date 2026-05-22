@@ -24,7 +24,7 @@ final class FileReadTokensTest extends TestCase
     {
         $configDir = MkTempFilename::run();
 
-        $this->assertSame([], new FileReadTokens($configDir)->get());
+        $this->assertSame([], new FileReadTokens($configDir)->read()->toArray());
     }
 
     #[TestDox('It returns tokens when: file does not exist (`[]`)')]
@@ -32,9 +32,11 @@ final class FileReadTokensTest extends TestCase
     {
         $configDir = Mktemp::run();
 
-        $this->assertSame([], new FileReadTokens($configDir)->get());
-
-        Rmdir::run($configDir);
+        try {
+            $this->assertSame([], new FileReadTokens($configDir)->read()->toArray());
+        } finally {
+            Rmdir::run($configDir);
+        }
     }
 
     /** @param array<string, string> $tokens */
@@ -47,18 +49,20 @@ final class FileReadTokensTest extends TestCase
         $configDir = Mktemp::run();
         file_put_contents("{$configDir}/tokens.json", json_encode($tokens));
 
-        $this->assertSame($tokens, new FileReadTokens($configDir)->get());
-
-        Rmdir::run($configDir);
+        try {
+            $this->assertSame($tokens, new FileReadTokens($configDir)->read()->toArray());
+        } finally {
+            Rmdir::run($configDir);
+        }
     }
 
     /**
-     * @return \Generator<array{
+     * @return \Iterator<array{
      *     scenario: string,
      *     tokens: array<string, string>,
      * }>
      */
-    public static function tokensProvider(): \Generator
+    public static function tokensProvider(): \Iterator
     {
         yield [
             'scenario' => 'no tokens (`[]`)',
@@ -71,10 +75,24 @@ final class FileReadTokensTest extends TestCase
         yield [
             'scenario' => "many tokens (`['s1' => 't1', 's2' => 't2']`)",
             'tokens' => [
-                'service-a' => TokenFixture::makeString(),
-                'service-b' => TokenFixture::makeString(),
+                ServiceFixture::makeString() => TokenFixture::makeString(),
+                ServiceFixture::makeAnotherString() => TokenFixture::makeString(),
             ],
         ];
+    }
+
+    #[TestDox('It fails when: file contains invalid JSON')]
+    public function test_it_fails_when_file_has_invalid_json(): void
+    {
+        $configDir = Mktemp::run();
+        file_put_contents("{$configDir}/tokens.json", 'not valid json');
+
+        $this->expectException(ServerErrorException::class);
+        try {
+            new FileReadTokens($configDir)->read();
+        } finally {
+            Rmdir::run($configDir);
+        }
     }
 
     #[TestDox('It fails when: file cannot be read')]
@@ -85,58 +103,9 @@ final class FileReadTokensTest extends TestCase
 
         $this->expectException(ServerErrorException::class);
         try {
-            new FileReadTokens($configDir)->get();
+            new FileReadTokens($configDir)->read();
         } finally {
             Rmdir::run($configDir);
         }
-    }
-
-    #[TestDox('It fails when: file contains invalid data (`not valid json`)')]
-    public function test_it_fails_when_file_contains_invalid_data(): void
-    {
-        $configDir = Mktemp::run();
-        file_put_contents("{$configDir}/tokens.json", 'not valid json');
-
-        $this->expectException(ServerErrorException::class);
-        try {
-            new FileReadTokens($configDir)->get();
-        } finally {
-            Rmdir::run($configDir);
-        }
-    }
-
-    #[DataProvider('invalidTokensProvider')]
-    #[TestDox('It fails when: file contains non string $scenario')]
-    public function test_it_fails_when_file_contains_non_string_tokens(
-        string $scenario,
-        string $content,
-    ): void {
-        $configDir = Mktemp::run();
-        file_put_contents("{$configDir}/tokens.json", $content);
-
-        $this->expectException(ServerErrorException::class);
-        try {
-            new FileReadTokens($configDir)->get();
-        } finally {
-            Rmdir::run($configDir);
-        }
-    }
-
-    /**
-     * @return \Generator<array{
-     *     scenario: string,
-     *     content: string,
-     * }>
-     */
-    public static function invalidTokensProvider(): \Generator
-    {
-        yield [
-            'scenario' => 'service (`["token"]`, integer key)',
-            'content' => '["token"]',
-        ];
-        yield [
-            'scenario' => 'token (`{"service": 123}`)',
-            'content' => '{"service": 123}',
-        ];
     }
 }

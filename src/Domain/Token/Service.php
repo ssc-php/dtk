@@ -8,6 +8,7 @@ use Ssc\Dtk\Domain\Exception\ValidationFailedException;
 
 enum Service: string
 {
+    case Jira = 'jira';
     case Youtrack = 'youtrack';
 
     /**

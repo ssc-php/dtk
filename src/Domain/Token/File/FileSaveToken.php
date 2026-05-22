@@ -53,7 +53,7 @@ final readonly class FileSaveToken implements SaveTokenStrategy
             "Saving token for `{$service->toString()}` to: `{$this->dataDir}/tokens.json`",
         );
 
-        $tokens = $this->fileReadTokens->get();
+        $tokens = $this->fileReadTokens->read()->toArray();
 
         $tokens[$service->toString()] = $token->toString();
 

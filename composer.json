@@ -13,9 +13,11 @@
         "symfony/console": "^8.0.8",
         "symfony/dotenv": "^8.0.8",
         "symfony/framework-bundle": "^8.0.8",
+        "symfony/http-client": "^8.0.8",
         "symfony/monolog-bundle": "^4.0.2",
         "symfony/process": "^8.0.8",
         "symfony/runtime": "^8.0.8",
+        "symfony/translation-contracts": "^3.7",
         "symfony/yaml": "^8.0.8"
     },
     "require-dev": {

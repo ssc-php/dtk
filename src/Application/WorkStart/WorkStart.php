@@ -10,10 +10,11 @@ namespace Ssc\Dtk\Application\WorkStart;
 final readonly class WorkStart
 {
     public function __construct(
-        public string $newBranch,
+        public string $newBranch = '',
         public string $startingPoint = 'origin/main',
         public string $ticketId = '',
         public bool $autostash = false,
+        public string $ticketUrl = '',
     ) {
     }
 }
