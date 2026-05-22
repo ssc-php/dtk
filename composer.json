@@ -10,23 +10,23 @@
     ],
     "require": {
         "php": ">=8.5",
-        "symfony/console": "^8.0.8",
-        "symfony/dotenv": "^8.0.8",
-        "symfony/framework-bundle": "^8.0.8",
-        "symfony/http-client": "^8.0.8",
+        "symfony/console": "^8.0.11",
+        "symfony/dotenv": "^8.0.11",
+        "symfony/framework-bundle": "^8.0.11",
+        "symfony/http-client": "^8.0.9",
         "symfony/monolog-bundle": "^4.0.2",
-        "symfony/process": "^8.0.8",
-        "symfony/runtime": "^8.0.8",
+        "symfony/process": "^8.0.11",
+        "symfony/runtime": "^8.0.12",
         "symfony/translation-contracts": "^3.7",
-        "symfony/yaml": "^8.0.8"
+        "symfony/yaml": "^8.0.12"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.95.1",
+        "friendsofphp/php-cs-fixer": "^3.95.2",
         "phpspec/prophecy-phpunit": "^2.5",
-        "phpunit/phpunit": "^13.1.7",
+        "phpunit/phpunit": "^13.1.11",
         "jangregor/phpstan-prophecy": "^2.3",
-        "phpstan/phpstan": "^2.1.53",
-        "rector/rector": "^2.4.2",
+        "phpstan/phpstan": "^2.1.55",
+        "rector/rector": "^2.4.4",
         "rector/swiss-knife": "^2.3.5"
     },
     "replace": {
