@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-05-22
+
+### Added
+- connect to Jira to retrieve ticket info on work:start
+
 ## [0.4.0] - 2026-04-29
 
 ### Added
@@ -47,7 +52,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add `dtk` app
 - add `dtk --version` flag
 
-[Unreleased]: https://github.com/ssc-php/dtk/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/ssc-php/dtk/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/ssc-php/dtk/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/ssc-php/dtk/compare/v0.3.2...v0.4.0
 [0.3.2]: https://github.com/ssc-php/dtk/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/ssc-php/dtk/compare/v0.3.0...v0.3.1
